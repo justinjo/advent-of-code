@@ -50,4 +50,3 @@ class AdventDay(ABC):
         print(self.pretty_name)
         print(f'Part One: {self.part_one()}')
         print(f'Part Two: {self.part_two()}')
-        print()
