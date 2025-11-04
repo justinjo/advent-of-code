@@ -55,7 +55,60 @@ class Advent2019Day7(AdventDay):
         return max_output
 
     def part_two(self) -> int:
-        ...
+        self._convert_input_to_int()
+        phase_settings = [5, 6, 7, 8, 9]
+        phase_combos = itertools.permutations(phase_settings, 5)
+        max_output = 0
+
+        for phase_setting in phase_combos:
+            # a, b, c, d, e
+            intcodes = [
+                Intcode(
+                    deepcopy(self.input_int_array),
+                    args=[phase_setting[0], 0],
+                    silence_output=True,
+                    input_from_args_only=True,
+                ),
+                Intcode(
+                    deepcopy(self.input_int_array),
+                    args=[phase_setting[1]],
+                    silence_output=True,
+                    input_from_args_only=True,
+                ),
+                Intcode(
+                    deepcopy(self.input_int_array),
+                    args=[phase_setting[2]],
+                    silence_output=True,
+                    input_from_args_only=True,
+                ),
+                Intcode(
+                    deepcopy(self.input_int_array),
+                    args=[phase_setting[3]],
+                    silence_output=True,
+                    input_from_args_only=True,
+                ),
+                Intcode(
+                    deepcopy(self.input_int_array),
+                    args=[phase_setting[4]],
+                    silence_output=True,
+                    input_from_args_only=True,
+                ),
+            ]
+            intcodes[0].execute()
+
+            i = 0
+            while not intcodes[-1].finished_execution():
+                next_i = (i + 1) % 5
+                output = intcodes[i].popleft_output_value()
+                
+                intcodes[next_i].add_args([output])
+                intcodes[next_i].execute()
+
+                i = next_i
+
+            max_output = max(intcodes[-1].get_most_recent_output_value(), max_output)
+
+        return max_output
 
 
 Advent2019Day7().run()

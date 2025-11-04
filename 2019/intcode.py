@@ -4,18 +4,20 @@ class Intcode:
     MASK_1 = 100
     MASK_2 = 1000
     MASK_3 = 10000
-    output_values = []
 
     def __init__(
         self,
         memory: list[int],
         args: list[int] = [],
         silence_output: bool = False,
+        input_from_args_only: bool = False,
     ) -> None:
         self.memory = memory
         self.index = 0
         self.args = args
         self.silence_output = silence_output
+        self.input_from_args_only = input_from_args_only
+        self.output_values = []
 
     def _get_opcode(self, value: int) -> int:
         return value % 100
@@ -45,7 +47,15 @@ class Intcode:
         self.index += 4
 
     def _input(self) -> None:
-        val = self.args.pop(0) if self.args else input("Input: ")
+        val = 0
+        if self.args:
+            val = self.args.pop(0)
+        elif self.input_from_args_only:
+            # wait for next input
+            self.halt = True
+            return
+        else:
+            val = input("Input: ")
         self.memory[self.memory[self.index+1]] = int(val)
         self.index += 2
 
@@ -113,9 +123,18 @@ class Intcode:
             raise Exception
 
     def execute(self) -> None:
-        self.index = 0
-        while self.memory[self.index] != 99:
+        self.halt = False
+        while self.memory[self.index] != 99 and not self.halt:
             self._execute_instruction()
 
     def get_most_recent_output_value(self) -> int:
         return self.output_values[-1]
+    
+    def add_args(self, args: list[int]) -> None:
+        self.args.extend(args)
+
+    def popleft_output_value(self) -> int:
+        return self.output_values.pop(0)
+    
+    def finished_execution(self) -> bool:
+        return self.memory[self.index] == 99
