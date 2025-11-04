@@ -4,10 +4,18 @@ class Intcode:
     MASK_1 = 100
     MASK_2 = 1000
     MASK_3 = 10000
+    output_values = []
 
-    def __init__(self, memory: list[int]) -> None:
+    def __init__(
+        self,
+        memory: list[int],
+        args: list[int] = [],
+        silence_output: bool = False,
+    ) -> None:
         self.memory = memory
         self.index = 0
+        self.args = args
+        self.silence_output = silence_output
 
     def _get_opcode(self, value: int) -> int:
         return value % 100
@@ -37,14 +45,16 @@ class Intcode:
         self.index += 4
 
     def _input(self) -> None:
-        val = input("Input: ")
+        val = self.args.pop(0) if self.args else input("Input: ")
         self.memory[self.memory[self.index+1]] = int(val)
         self.index += 2
 
     def _output(self) -> None:
         mode = self._get_mode(self.memory[self.index], self.MASK_1)
         i = self.index+1 if mode == self.IMMEDIATE else self.memory[self.index+1]
-        print(self.memory[i])
+        if not self.silence_output:
+            print(self.memory[i])
+        self.output_values.append(self.memory[i])
         self.index += 2
     
     def _jump_if_true(self) -> None:
@@ -106,3 +116,6 @@ class Intcode:
         self.index = 0
         while self.memory[self.index] != 99:
             self._execute_instruction()
+
+    def get_most_recent_output_value(self) -> int:
+        return self.output_values[-1]
