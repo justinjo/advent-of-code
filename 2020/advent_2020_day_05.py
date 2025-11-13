@@ -2,7 +2,7 @@ from advent_day import AdventDay
 from collections import defaultdict
 from copy import deepcopy
 
-class Advent2020Day5(AdventDay):
+class Advent2020Day05(AdventDay):
     ROWS = 128
     COLS = 8
     BASE_TICKET = {
@@ -77,4 +77,4 @@ class Advent2020Day5(AdventDay):
         return -1
 
 
-Advent2020Day5().run()
+Advent2020Day05().run()

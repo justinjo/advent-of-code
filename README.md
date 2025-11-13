@@ -11,13 +11,13 @@ Use Python version >=3.10
 
 ## Usage
 
-Follow the steps below, given a year YYYY (e.g. 2019) and day DD (e.g. 1, 20)
+Follow the steps below, given a year YYYY (e.g. 2019) and day DD (e.g. 01, 20)
 
 #### 1. If it doesn't exist, create directory YYYY
 #### 2. Create input file `advent_YYYY_day_DD.txt` in directory YYYY
 #### 3. Paste input from the current day's problem to said text file
 
-##### Example: 2019/advent_2019_day_1.txt
+##### Example: 2019/advent_2019_day_01.txt
 ```
 106001
 131342
@@ -32,11 +32,11 @@ Follow the steps below, given a year YYYY (e.g. 2019) and day DD (e.g. 1, 20)
 
 The solution values should be returned by `part_one` and `part_two`. They will be printed to stdout.
 
-##### Example: 2019/advent_2019_day_1.py
+##### Example: 2019/advent_2019_day_01.py
 ```python
 from advent_day import AdventDay
 
-Advent2019Day1(AdventDay):
+Advent2019Day01(AdventDay):
     def _helper_func(self) -> None:
         ...
 
@@ -48,7 +48,7 @@ Advent2019Day1(AdventDay):
         return 2
 
 
-Advent2019Day1().run()
+Advent2019Day01().run()
 ```
 
 #### 5. Run code
@@ -57,5 +57,5 @@ Run: `python3 -m YYYY.advent_YYYY_day_DD`
 
 ##### e.g.
 ```
-python3 -m 2019.advent_2019_day_1
+python3 -m 2019.advent_2019_day_01
 ```

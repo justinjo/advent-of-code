@@ -1,7 +1,7 @@
 from advent_day import AdventDay
 from collections import Counter
 
-class Advent2020Day9(AdventDay):
+class Advent2020Day09(AdventDay):
 
     def part_one(self, preamble_length: int = 25) -> int:
         self._convert_input_to_int()
@@ -35,4 +35,4 @@ class Advent2020Day9(AdventDay):
         return min(arr[lo:hi+1]) + max(arr[lo:hi+1])
 
 
-Advent2020Day9().run()
+Advent2020Day09().run()

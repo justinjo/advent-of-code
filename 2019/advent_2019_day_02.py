@@ -1,7 +1,7 @@
 from advent_day import AdventDay
 from copy import deepcopy
 
-class Advent2019Day2(AdventDay):
+class Advent2019Day02(AdventDay):
 
     def _format_input(self, arr: list[int], noun: int = 12, verb: int = 2) -> None:
         arr[1] = noun
@@ -41,4 +41,4 @@ class Advent2019Day2(AdventDay):
         return -1
 
 
-Advent2019Day2().run()
+Advent2019Day02().run()

@@ -1,6 +1,6 @@
 from advent_day import AdventDay
 
-class Advent2020Day8(AdventDay):
+class Advent2020Day08(AdventDay):
 
     def _parse_input(self) -> list[tuple[str, int]]:
         res = []
@@ -57,4 +57,4 @@ class Advent2020Day8(AdventDay):
         return -1
 
 
-Advent2020Day8().run()
+Advent2020Day08().run()

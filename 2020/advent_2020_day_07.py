@@ -1,7 +1,7 @@
 from advent_day import AdventDay
 from collections import defaultdict
 
-class Advent2020Day7(AdventDay):
+class Advent2020Day07(AdventDay):
     TARGET_BAG = 'shiny gold bags'
 
     def _build_map_from_input(self) -> dict[str, set[tuple[int, str]]]:
@@ -53,4 +53,4 @@ class Advent2020Day7(AdventDay):
         return count
 
 
-Advent2020Day7().run()
+Advent2020Day07().run()

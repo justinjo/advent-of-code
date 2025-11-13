@@ -3,7 +3,7 @@ from .intcode import Intcode
 from copy import deepcopy
 import itertools
 
-class Advent2019Day7(AdventDay):
+class Advent2019Day07(AdventDay):
     NUM_AMPS = 5
 
     def part_one(self) -> int:
@@ -13,7 +13,7 @@ class Advent2019Day7(AdventDay):
         phase_settings = [0, 1, 2, 3, 4]
         phase_combos = itertools.permutations(phase_settings, 5)
         max_output = 0
-        
+
         for a, b, c, d, e in phase_combos:
             intcode_a = Intcode(
                 deepcopy(self.input_int_array),
@@ -100,7 +100,7 @@ class Advent2019Day7(AdventDay):
             while not intcodes[-1].finished_execution():
                 next_i = (i + 1) % 5
                 output = intcodes[i].popleft_output_value()
-                
+
                 intcodes[next_i].add_args([output])
                 intcodes[next_i].execute()
 
@@ -111,4 +111,4 @@ class Advent2019Day7(AdventDay):
         return max_output
 
 
-Advent2019Day7().run()
+Advent2019Day07().run()

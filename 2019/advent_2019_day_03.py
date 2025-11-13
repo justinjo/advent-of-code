@@ -1,10 +1,10 @@
 from advent_day import AdventDay
 
-class Advent2019Day3(AdventDay):
+class Advent2019Day03(AdventDay):
 
     def _get_steps(self, direction: str) -> int:
         return int(direction[1:])
-    
+
     def _get_coord(
         self,
         cardinality: str,
@@ -20,13 +20,13 @@ class Advent2019Day3(AdventDay):
             return (origin_x - steps, origin_y)
         else: # cardinality == "D":
             return (origin_x, origin_y - steps)
-        
+
     def _manhattan_distance(self, coord: tuple[int, int]) -> int:
         return abs(coord[0]) + abs(coord[1])
-    
+
     def _closest_coord_to_origin(self, coord_1: tuple, coord_2: tuple) -> tuple:
         return coord_1 if self._manhattan_distance(coord_1) > self._manhattan_distance(coord_2) else coord_2
-    
+
     def part_one(self) -> int:
         wire_1 = self.input_str_array[0]
         wire_2 = self.input_str_array[1]
@@ -78,12 +78,12 @@ class Advent2019Day3(AdventDay):
             )
 
         return int(min_distance)
-    
+
     def part_two(self) -> int:
         wire_1 = self.input_str_array[0]
         wire_2 = self.input_str_array[1]
         # maps coord tuple to # of steps wire_1 took to arrive there
-        visited_coords = {} 
+        visited_coords = {}
         total_steps = 0
         current_coord = (0, 0)
         min_steps = float('inf')
@@ -138,4 +138,4 @@ class Advent2019Day3(AdventDay):
         return int(min_steps)
 
 
-Advent2019Day3().run()
+Advent2019Day03().run()

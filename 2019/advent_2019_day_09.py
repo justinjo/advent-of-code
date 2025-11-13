@@ -2,7 +2,7 @@ from advent_day import AdventDay
 from .intcode import Intcode
 from copy import deepcopy
 
-class Advent2019Day9(AdventDay):
+class Advent2019Day09(AdventDay):
 
     def part_one(self) -> int:
         self._convert_input_to_int()
@@ -16,4 +16,4 @@ class Advent2019Day9(AdventDay):
         return ic.get_most_recent_output_value()
 
 
-Advent2019Day9().run()
+Advent2019Day09().run()

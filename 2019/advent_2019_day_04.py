@@ -1,8 +1,8 @@
 from advent_day import AdventDay
 from collections import Counter
 
-class Advent2019Day4(AdventDay):
-    
+class Advent2019Day04(AdventDay):
+
     def _valid_code(self, code: int):
         has_adjacent = False
         is_increasing = True
@@ -35,7 +35,7 @@ class Advent2019Day4(AdventDay):
             if count == 2:
                 has_adjacent = True
         return has_adjacent and is_increasing
-    
+
     def _parse_input(self) -> tuple[int, int]:
         low, hi = self.input_str_array[0].split('-')
         return (int(low), int(hi))
@@ -57,4 +57,4 @@ class Advent2019Day4(AdventDay):
         return num
 
 
-Advent2019Day4().run()
+Advent2019Day04().run()

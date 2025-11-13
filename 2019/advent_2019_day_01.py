@@ -1,6 +1,6 @@
 from advent_day import AdventDay
 
-class Advent2019Day1(AdventDay):
+class Advent2019Day01(AdventDay):
 
     def _fuel_calc(self, mass: int) -> int:
         return mass//3 - 2
@@ -24,4 +24,4 @@ class Advent2019Day1(AdventDay):
         return total_fuel
 
 
-Advent2019Day1().run()
+Advent2019Day01().run()

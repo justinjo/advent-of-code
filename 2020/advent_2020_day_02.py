@@ -1,7 +1,7 @@
 from advent_day import AdventDay
 from collections import Counter
 
-class Advent2020Day2(AdventDay):
+class Advent2020Day02(AdventDay):
 
     def _format_input(self, string: str) -> tuple[int, int, str, str]:
         min_count, l = string.split("-")
@@ -48,4 +48,4 @@ class Advent2020Day2(AdventDay):
         return valid_passwords
 
 
-Advent2020Day2().run()
+Advent2020Day02().run()

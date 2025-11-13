@@ -1,7 +1,7 @@
 from advent_day import AdventDay
 from collections import Counter
 
-class Advent2020Day6(AdventDay):
+class Advent2020Day06(AdventDay):
 
     def part_one(self) -> int:
         arr = self.input_str_array
@@ -38,4 +38,4 @@ class Advent2020Day6(AdventDay):
         return count_sum
 
 
-Advent2020Day6().run()
+Advent2020Day06().run()

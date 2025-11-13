@@ -1,6 +1,6 @@
 from advent_day import AdventDay
 
-class Advent2020Day3(AdventDay):
+class Advent2020Day03(AdventDay):
     TREE = "#"
 
     def _calc_trees(self, rise: int, fall: int) -> int:
@@ -28,4 +28,4 @@ class Advent2020Day3(AdventDay):
         )
 
 
-Advent2020Day3().run()
+Advent2020Day03().run()

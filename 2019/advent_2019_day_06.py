@@ -1,7 +1,7 @@
 from advent_day import AdventDay
 from collections import defaultdict
 
-class Advent2019Day6(AdventDay):
+class Advent2019Day06(AdventDay):
     def _parse_input(self) -> None:
         self.parsed_input = [line.split(')') for line in self.input_str_array]
 
@@ -11,7 +11,7 @@ class Advent2019Day6(AdventDay):
         for orbit in self.parsed_input:
             mass_1, mass_2 = orbit
             orbit_map[mass_1].append(mass_2)
-        
+
         queue = ['COM']
         orbit_level = orbit_count = 0
         while queue:
@@ -47,4 +47,4 @@ class Advent2019Day6(AdventDay):
             queue = next_queue
         return jumps - 2 # ignore first and last jumps
 
-Advent2019Day6().run()
+Advent2019Day06().run()

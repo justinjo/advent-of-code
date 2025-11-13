@@ -2,7 +2,7 @@ from advent_day import AdventDay
 from .intcode import Intcode
 from copy import deepcopy
 
-class Advent2019Day5(AdventDay):
+class Advent2019Day05(AdventDay):
 
     def part_one(self) -> str:
         self._convert_input_to_int()
@@ -15,4 +15,4 @@ class Advent2019Day5(AdventDay):
         return 'Program Terminated'
 
 
-Advent2019Day5().run()
+Advent2019Day05().run()

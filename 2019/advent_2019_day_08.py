@@ -1,7 +1,7 @@
 from advent_day import AdventDay
 from collections import Counter
 
-class Advent2019Day8(AdventDay):
+class Advent2019Day08(AdventDay):
     WIDTH = 25
     HEIGHT = 6
     BLANK = '_'
@@ -55,4 +55,4 @@ class Advent2019Day8(AdventDay):
         return image
 
 
-Advent2019Day8().run()
+Advent2019Day08().run()

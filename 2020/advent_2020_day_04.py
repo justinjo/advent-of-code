@@ -1,6 +1,6 @@
 from advent_day import AdventDay
 
-class Advent2020Day4(AdventDay):
+class Advent2020Day04(AdventDay):
     fields = {
         'byr': {
             'required': True,
@@ -118,4 +118,4 @@ class Advent2020Day4(AdventDay):
         return valid_passports
 
 
-Advent2020Day4().run()
+Advent2020Day04().run()

@@ -26,8 +26,8 @@ class AdventDay(ABC):
         (e.g. advent_2019_day_01.txt)
         They exist in the same directory as the class
         """
-        return f'{self.year}/advent_{self.year}_day_{self.day}.txt'
-    
+        return f'{self.year}/advent_{self.year}_day_{str(self.day).zfill(2)}.txt'
+
     def _read_input(self) -> None:
         self.input_str_array = open(self._get_input_file_name()).read().splitlines()
 

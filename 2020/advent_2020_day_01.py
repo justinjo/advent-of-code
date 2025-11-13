@@ -1,6 +1,6 @@
 from advent_day import AdventDay
 
-class Advent2020Day1(AdventDay):
+class Advent2020Day01(AdventDay):
 
     def _two_sum(self, array: list, target: int) -> tuple[int, int]:
         entries = {}
@@ -32,4 +32,4 @@ class Advent2020Day1(AdventDay):
         return -1
 
 
-Advent2020Day1().run()
+Advent2020Day01().run()
