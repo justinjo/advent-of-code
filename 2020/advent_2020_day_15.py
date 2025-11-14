@@ -13,15 +13,12 @@ class Advent2020Day15(AdventDay):
                 curr_num = self.input_int_array[i]
                 i += 1
             else:
-                if prev_num in most_recent and len(most_recent[prev_num]) == 2:
-                    curr_num = most_recent[prev_num][1] - most_recent[prev_num][0]
+                if prev_num in most_recent and len(most_recent[prev_num]) >= 2:
+                    curr_num = most_recent[prev_num][-1] - most_recent[prev_num][-2]
                 else:
                     curr_num = 0
 
             most_recent[curr_num].append(turn)
-            if len(most_recent[curr_num]) > 2:
-                most_recent[curr_num].pop(0)
-
             prev_num = curr_num
             turn += 1
 
@@ -32,7 +29,8 @@ class Advent2020Day15(AdventDay):
         return self._play_game_until(2020)
 
     def part_two(self) -> int:
-        ...
+        # takes a bit under 15 seconds to run
+        return self._play_game_until(30000000)
 
 
 Advent2020Day15().run()
