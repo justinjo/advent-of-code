@@ -42,6 +42,16 @@ class Advent2018Day06(AdventDay):
         num_closest = len(distances_coords_map[min_distance])
         return distances_coords_map[min_distance][0] if num_closest == 1 else self.INVALID_COORD
 
+    def _within_distance(
+        self,
+        distances_coords_map: dict[int, list[Coord]],
+        max_distance: int = 10000,
+    ) -> bool:
+        distance = 0
+        for d in distances_coords_map:
+            distance += d * len(distances_coords_map[d])
+        return distance < max_distance
+
     def part_one(self) -> int:
         coords = self._parse_input()
         max_col, max_row = self._max_coord(coords)
@@ -65,7 +75,17 @@ class Advent2018Day06(AdventDay):
         return max_area
 
     def part_two(self) -> int:
-        ...
+        coords = self._parse_input()
+        max_col, max_row = self._max_coord(coords)
+        safe_area = 0
+
+        for r in range(max_row):
+            for c in range(max_col):
+                distances_coords_map = self._get_distances(coords, c, r)
+                if self._within_distance(distances_coords_map):
+                    safe_area += 1
+
+        return safe_area
 
 
 Advent2018Day06().run()
