@@ -7,7 +7,7 @@ https://adventofcode.com
 - [Usage](#usage)
 
 ## Requirements
-Use Python version >=3.10
+Use Python version >=3.12
 
 ## Usage
 
