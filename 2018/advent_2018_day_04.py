@@ -39,7 +39,12 @@ class Guard:
         self.is_asleep = False
 
     def sleepiest_minute(self) -> int:
-        return self.sleep_minutes.most_common(1)[0][0]
+        minute = self.sleep_minutes.most_common(1)
+        return minute[0][0] if minute else -1 # -1 if guard hasn't slept
+
+    def times_slept_on_sleepiest_minute(self) ->int:
+        minute = self.sleepiest_minute()
+        return self.sleep_minutes[minute]
 
 
 class Scheduler:
@@ -83,6 +88,13 @@ class Scheduler:
                 sleepiest = guard
         return sleepiest
 
+    def get_frequently_sleepy_guard(self) -> Guard:
+        sleepiest = Guard()
+        for guard in self.guards.values():
+            if guard.times_slept_on_sleepiest_minute() > sleepiest.times_slept_on_sleepiest_minute():
+                sleepiest = guard
+        return sleepiest
+
 
 class Advent2018Day04(AdventDay):
 
@@ -112,7 +124,11 @@ class Advent2018Day04(AdventDay):
         return guard.id * guard.sleepiest_minute()
 
     def part_two(self) -> int:
-        ...
+        # self._parse_input()
+        scheduler = Scheduler(self.events)
+        scheduler.run_schedule()
+        guard = scheduler.get_frequently_sleepy_guard()
+        return guard.id * guard.sleepiest_minute()
 
 
 Advent2018Day04().run()
