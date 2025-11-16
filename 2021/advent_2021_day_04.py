@@ -9,6 +9,7 @@ class BingoBoard:
         self.col_counts: list[int] = [0] * self.COLS
         self.rows: list[list[int]] = []
         self.numbers_found: set[int] = set()
+        self.winning_number = 0
 
     def add_row(self, row_str: str) -> None:
         row_int_arr = []
@@ -30,7 +31,10 @@ class BingoBoard:
                     self.row_counts[r] += 1
                     self.col_counts[c] += 1
 
-        return self.has_bingo()
+        if self.has_bingo():
+            self.winning_number = num
+            return True
+        return False
 
     def has_bingo(self) -> bool:
         for rc in self.row_counts:
@@ -41,13 +45,13 @@ class BingoBoard:
                 return True
         return False
 
-    def get_score(self, num: int) -> int:
+    def get_score(self) -> int:
         value = 0
         for r in range(self.ROWS):
             for c in range(self.COLS):
                 if self.rows[r][c] not in self.numbers_found:
                     value += self.rows[r][c]
-        return value * num
+        return value * self.winning_number
 
     def print(self) -> None:
         for r in range(self.ROWS):
@@ -60,26 +64,38 @@ class BingoBoard:
 
 class Advent2021Day04(AdventDay):
 
-    def part_one(self) -> int:
+    def _play_bingo(self) -> list[BingoBoard]:
+        # returns boards in win order
         numbers_to_call: list[int] = [int(s) for s in self.input_str_array[0].split(',')]
-        boards: list[BingoBoard] = []
+        playing_boards_map: dict[int, BingoBoard] = {}
+        playing_boards_set: set[int] = set()
+        winning_boards: list[BingoBoard] = []
+
         i = 2
         while i < self.input_length:
             board = BingoBoard()
-            boards.append(board)
+            playing_boards_map[i] = board
+            playing_boards_set.add(i)
             while i < self.input_length and self.input_str_array[i]:
                 board.add_row(self.input_str_array[i])
                 i += 1
             i += 1
 
         for num in numbers_to_call:
-            for board in boards:
-                if board.add_num(num):
-                    return board.get_score(num)
-        return -1
+            boards_playing = list(playing_boards_set)
+            for i in boards_playing:
+                if playing_boards_map[i].add_num(num):
+                    winning_boards.append(playing_boards_map[i])
+                    playing_boards_set.remove(i)
+
+        return winning_boards
+
+
+    def part_one(self) -> int:
+        return self._play_bingo()[0].get_score()
 
     def part_two(self) -> int:
-        ...
+        return self._play_bingo()[-1].get_score()
 
 
 Advent2021Day04().run()
