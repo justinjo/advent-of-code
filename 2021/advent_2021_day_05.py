@@ -25,9 +25,19 @@ class Line:
             xs = [self.x1, self.x2]
             for x in range(min(xs), max(xs) + 1):
                 points.append((x, self.y1))
-        else:
-            # sloped
-            pass
+        else: # diagonal only
+            # sort based off x1 and x2 - min has lower x, max has higher x
+            # y relationship not guaranteed
+            x_min, y_min = min([(self.x1, self.y1), (self.x2, self.y2)])
+            x_max, y_max = max([(self.x1, self.y1), (self.x2, self.y2)])
+            x = x_min
+            y = y_min
+            slope = 1 if y_min < y_max else -1
+            while x != x_max and y != y_max:
+                points.append((x, y))
+                x += 1
+                y += slope
+            points.append((x_max, y_max))
         return points
 
 
@@ -57,7 +67,17 @@ class Advent2021Day05(AdventDay):
         return overlaps
 
     def part_two(self) -> int:
-        ...
+        lines = self._parse_input()
+        point_counter = Counter()
+        for line in lines:
+            points = line.get_points()
+            point_counter.update(points)
+
+        overlaps = 0
+        for point in point_counter:
+            if point_counter[point] >= 2:
+                overlaps += 1
+        return overlaps
 
 
 Advent2021Day05().run()
