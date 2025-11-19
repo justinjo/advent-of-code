@@ -28,6 +28,17 @@ class Advent2023Day02(AdventDay):
                     return False
         return True
 
+    def get_min_power(self, turns: list[Turn]) -> int:
+        min_count_map = {
+            'red': 0,
+            'green': 0,
+            'blue': 0,
+        }
+        for turn in turns:
+            for color in turn.color_count_map:
+                min_count_map[color] = max(min_count_map[color], turn.color_count_map[color])
+        return min_count_map['red'] * min_count_map['green'] * min_count_map['blue']
+
     def part_one(self) -> int:
         game_turns_map = self._parse_input()
         bag_count_map = {
@@ -42,7 +53,11 @@ class Advent2023Day02(AdventDay):
         return games_sum
 
     def part_two(self) -> int:
-        ...
+        game_turns_map = self._parse_input()
+        powers_sum = 0
+        for game in game_turns_map:
+            powers_sum += self.get_min_power(game_turns_map[game])
+        return powers_sum
 
 
 Advent2023Day02().run()
