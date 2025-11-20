@@ -1,4 +1,5 @@
 from advent_day import AdventDay
+from collections import Counter
 
 class Card:
 
@@ -11,11 +12,13 @@ class Card:
         self.score = 0
 
     def get_score(self) -> int:
-        score = 0
+        return 2 * self.get_num_matches()
+
+    def get_num_matches(self) -> int:
+        matches = 0
         for num in self.hand_nums:
-            if num in self.winning_nums:
-                score = score * 2 if score else 1
-        return score
+            matches += 1 if num in self.winning_nums else 0
+        return matches
 
 
 class Advent2023Day04(AdventDay):
@@ -24,7 +27,17 @@ class Advent2023Day04(AdventDay):
         return sum([Card(card).get_score() for card in self.input_str_array])
 
     def part_two(self) -> int:
-        ...
+        cards = [Card(card) for card in self.input_str_array]
+        card_ids = sorted([card.id for card in cards])
+        card_count = Counter(card_ids)
+        total_cards = 0
+        for id in card_ids:
+            num_cards = card_count[id]
+            num_matches = cards[id - 1].get_num_matches()
+            card_count.update(list(range(id + 1, id + num_matches + 1)) * num_cards)
+            total_cards += num_cards
+
+        return total_cards
 
 
 Advent2023Day04().run()
