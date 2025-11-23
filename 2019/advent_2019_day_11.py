@@ -19,7 +19,7 @@ class Tile:
 
 
 class Advent2019Day11(AdventDay):
-    DIRECTIONS: list[tuple[int, int]] = [(0, -1), (1, 0), (0, 1), (-1, 0)]
+    DIRECTIONS: list[tuple[int, int]] = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
     def paint_tiles(self, start_color: int = Tile.BLACK) -> dict[tuple[int, int], Tile]:
         x = y = dir_i = 0
@@ -44,12 +44,32 @@ class Advent2019Day11(AdventDay):
             ic.add_args([tile_map[(x, y)].color])
         return tile_map
 
+    def print_tile_map(self, tile_map: dict[tuple[int, int], Tile]) -> None:
+        # sort coords by y val
+        coords = sorted(sorted(tile_map), key=lambda c: c[1], reverse=True)
+        min_x = min(coords)[0]
+        row = ''
+        prev_y =  None
+        for x, y in coords:
+            if y != prev_y: # new line
+                print(row)
+                row = ''
+                i = 0 # align all values when printing
+                while min_x + i < x:
+                    row += ' '
+                    i += 1
+            row += '#' if tile_map[(x, y)].color == Tile.WHITE else ' '
+            prev_y = y
+        print(row + '\n')
+
     def part_one(self) -> int:
         self._convert_input_to_int()
         return len([t for t in self.paint_tiles().values() if t.was_painted()])
 
     def part_two(self) -> str:
-        ...
+        self._convert_input_to_int()
+        self.print_tile_map(self.paint_tiles(Tile.WHITE))
+        return ''
 
 
 Advent2019Day11().run()
