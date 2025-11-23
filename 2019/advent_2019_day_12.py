@@ -1,7 +1,9 @@
 from advent_day import AdventDay
 import re
+import math
 
 type Coord3D = tuple[int, int, int]
+type CoordState = tuple[int, int, int, int, int, int, int, int]
 type Moon = dict # [str, Coord3D | list[int]
 type MoonsMap = dict[str, Moon]
 
@@ -70,6 +72,55 @@ class Advent2019Day12(AdventDay):
             total_energy += potential_energy * kinetic_energy
         return total_energy
 
+    def get_state(self, moons: MoonsMap, vertex_i: int) -> CoordState:
+        io, eur, gan, cal = moons.values()
+        return (
+            io['pos'][vertex_i],
+            io['vel'][vertex_i],
+            eur['pos'][vertex_i],
+            eur['vel'][vertex_i],
+            gan['pos'][vertex_i],
+            gan['vel'][vertex_i],
+            cal['pos'][vertex_i],
+            cal['vel'][vertex_i],
+        )
+
+    def find_steps_in_loop(self, moons: MoonsMap) -> tuple[int, int, int]:
+        x_map: dict[CoordState, int] = {}
+        y_map: dict[CoordState, int] = {}
+        z_map: dict[CoordState, int] = {}
+        x_found = y_found = z_found = False
+        step = x_steps = y_steps = z_steps = 0
+        x_state = self.get_state(moons, 0)
+        y_state = self.get_state(moons, 1)
+        z_state = self.get_state(moons, 2)
+        while not x_found or not y_found or not z_found:
+            x_found |= x_state in x_map
+            y_found |= y_state in y_map
+            z_found |= z_state in z_map
+            if not x_found:
+                x_map[x_state] = step
+            elif not x_steps:
+                x_found = True
+                x_steps = step
+            if not y_found:
+                y_map[y_state] = step
+            elif not y_steps:
+                y_found = True
+                y_steps = step
+            if not z_found:
+                z_map[z_state] = step
+            elif not z_steps:
+                z_found = True
+                z_steps = step
+            self.simulate_motion(moons)
+            x_state = self.get_state(moons, 0)
+            y_state = self.get_state(moons, 1)
+            z_state = self.get_state(moons, 2)
+            step += 1
+        return (x_steps, y_steps, z_steps)
+
+
     def print_moons(self, moons: MoonsMap, step: str = '') -> None:
         if step:
             print(f'after step: {step}')
@@ -80,8 +131,8 @@ class Advent2019Day12(AdventDay):
             a_x, a_y, a_z = moon['acc']
             pos = f'pos=<x={p_x:3}, y={p_y:2}, z={p_z:2}>'
             vel = f'vel=<x={v_x:3}, y={v_y:2}, z={v_z:2}>'
-            acc = f'delta=<x={a_x:3}, y={a_y:2}, z={a_z:2}>'
-            print(f'moon: {id} ' + pos + ', ' + vel + ', ' + acc)
+            acc = f'acc=<x={a_x:3}, y={a_y:2}, z={a_z:2}>'
+            print(f'moon: {id}\n' + pos + ', ' + vel + ', ' + acc)
         print()
 
     def part_one(self) -> int:
@@ -89,8 +140,10 @@ class Advent2019Day12(AdventDay):
         self.simulate_motion(moons, 1000)
         return self.calculate_total_energy(moons)
 
-    def part_two(self) -> str:
-        ...
+    def part_two(self) -> int:
+        moons = self.get_moon_coords()
+        x, y, z = self.find_steps_in_loop(moons)
+        return math.lcm(x, y, z)
 
 
 Advent2019Day12().run()
