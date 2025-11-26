@@ -1,33 +1,42 @@
-from collections import defaultdict
+from collections import defaultdict, deque
+from enum import IntEnum
 
-class Intcode:
+class Mode(IntEnum):
     POSITION = 0
     IMMEDIATE = 1
     RELATIVE = 2
-    MASK_1 = 100
-    MASK_2 = 1000
-    MASK_3 = 10000
+
+
+class Intcode:
 
     def __init__(
         self,
         memory: list[int],
-        args: list[int] = [],
-        silence_output: bool = False,
-        input_from_args_only: bool = False,
+        use_cli_io: bool = False,
+        queue_in: deque = deque(),
+        queue_out: deque = deque(),
     ) -> None:
-        self.memory = self._generate_memory_map(memory)
-        self.index = 0
-        self.relative_base = 0
-        self.args = args
-        self.silence_output = silence_output
-        self.input_from_args_only = input_from_args_only
-        self.output_values = []
+        self._create_memory_map(memory)
+        self.index = self.relative_base = 0
+        self.use_cli_io = use_cli_io
+        self.queue_in = queue_in
+        self.queue_out = queue_out
+        self.opcode_to_func_map = {
+            1: self._add,
+            2: self._multiply,
+            3: self._input,
+            4: self._output,
+            5: self._jump_if_true,
+            6: self._jump_if_false,
+            7: self._less_than,
+            8: self._equal_to,
+            9: self._adjust_relative_base,
+        }
 
-    def _generate_memory_map(self, memory: list[int]) -> dict[int, int]:
-        memory_map = defaultdict(int)
+    def _create_memory_map(self, memory: list[int]) -> None:
+        self.memory: dict[int, int] = defaultdict(int)
         for i in range(len(memory)):
-            memory_map[i] = memory[i]
-        return memory_map
+            self.memory[i] = memory[i]
 
     def _get_opcode(self, value: int) -> int:
         return value % 100
@@ -35,105 +44,92 @@ class Intcode:
     def _get_mode(self, value: int, mask: int) -> int:
         return value % (mask * 10) // mask
 
+    def _get_modes(self, value: int) -> tuple[int, int, int]:
+        mode_1 = self._get_mode(value, 100)
+        mode_2 = self._get_mode(value, 1000)
+        mode_3 = self._get_mode(value, 10000)
+        return (mode_1, mode_2, mode_3)
+
     def _get_index(self, index: int, mode: int) -> int:
-        if mode == self.POSITION:
+        if mode == Mode.POSITION:
             return self.memory[index]
-        elif mode == self.IMMEDIATE:
+        elif mode == Mode.IMMEDIATE:
             return index
-        elif mode == self.RELATIVE:
+        elif mode == Mode.RELATIVE:
             return self.memory[index] + self.relative_base
         raise Exception('Mode not supported')
 
     def _get_value(self, index: int, mode: int) -> int:
         return self.memory[self._get_index(index, mode)]
 
-    def _allocate_memory(self, new_size: int) -> None:
-        new_memory = [0] * new_size
-        for i in range(len(self.memory)):
-            new_memory[i] = self.memory[i]
-        self.memory = new_memory
+    def _set_value(self, index: int, mode: int, value: int) -> None:
+        self.memory[self._get_index(index, mode)] = value
 
     def _add(self) -> None:
-        mode_1 = self._get_mode(self.memory[self.index], self.MASK_1)
-        mode_2 = self._get_mode(self.memory[self.index], self.MASK_2)
-        mode_3 = self._get_mode(self.memory[self.index], self.MASK_3)
+        mode_1, mode_2, mode_3 = self._get_modes(self.memory[self.index])
         val_1 = self._get_value(self.index+1, mode_1)
         val_2 = self._get_value(self.index+2, mode_2)
-        index_3 = self._get_index(self.index+3, mode_3)
-        self.memory[index_3] = val_1 + val_2
+        self._set_value(self.index+3, mode_3, val_1 + val_2)
         self.index += 4
 
     def _multiply(self) -> None:
-        mode_1 = self._get_mode(self.memory[self.index], self.MASK_1)
-        mode_2 = self._get_mode(self.memory[self.index], self.MASK_2)
-        mode_3 = self._get_mode(self.memory[self.index], self.MASK_3)
+        mode_1, mode_2, mode_3 = self._get_modes(self.memory[self.index])
         val_1 = self._get_value(self.index+1, mode_1)
         val_2 = self._get_value(self.index+2, mode_2)
-        index_3 = self._get_index(self.index+3, mode_3)
-        self.memory[index_3] = val_1 * val_2
+        self._set_value(self.index+3, mode_3, val_1 * val_2)
         self.index += 4
 
     def _input(self) -> None:
-        mode = self._get_mode(self.memory[self.index], self.MASK_1)
-        index = self._get_index(self.index+1, mode)
+        mode, _, _ = self._get_modes(self.memory[self.index])
         val = 0
-        if self.args:
-            val = self.args.pop(0)
-        elif self.input_from_args_only:
-            # wait for next input
-            self.halt = True
-            return
-        else:
+        if self.use_cli_io:
             val = input("Input: ")
-        self.memory[index] = int(val)
+        elif self.queue_in:
+            val = self.queue_in.popleft()
+        else:
+            self.halt = True # wait for next input from self.queue_in
+            return
+        self._set_value(self.index+1, mode, int(val))
         self.index += 2
 
     def _output(self) -> None:
-        mode = self._get_mode(self.memory[self.index], self.MASK_1)
+        mode, _, _ = self._get_modes(self.memory[self.index])
         val = self._get_value(self.index+1, mode)
-        if not self.silence_output:
+        if self.use_cli_io:
             print(val)
-        self.output_values.append(val)
+        self.queue_out.append(val)
         self.index += 2
 
     def _jump_if_true(self) -> None:
-        mode_1 = self._get_mode(self.memory[self.index], self.MASK_1)
-        mode_2 = self._get_mode(self.memory[self.index], self.MASK_2)
+        mode_1, mode_2, _ = self._get_modes(self.memory[self.index])
         val_1 = self._get_value(self.index+1, mode_1)
         val_2 = self._get_value(self.index+2, mode_2)
         self.index = val_2 if val_1 else self.index + 3
 
     def _jump_if_false(self) -> None:
-        mode_1 = self._get_mode(self.memory[self.index], self.MASK_1)
-        mode_2 = self._get_mode(self.memory[self.index], self.MASK_2)
+        mode_1, mode_2, _ = self._get_modes(self.memory[self.index])
         val_1 = self._get_value(self.index+1, mode_1)
         val_2 = self._get_value(self.index+2, mode_2)
         self.index = val_2 if val_1 == 0 else self.index + 3
 
     def _less_than(self) -> None:
-        mode_1 = self._get_mode(self.memory[self.index], self.MASK_1)
-        mode_2 = self._get_mode(self.memory[self.index], self.MASK_2)
-        mode_3 = self._get_mode(self.memory[self.index], self.MASK_3)
+        mode_1, mode_2, mode_3 = self._get_modes(self.memory[self.index])
         val_1 = self._get_value(self.index+1, mode_1)
         val_2 = self._get_value(self.index+2, mode_2)
-        index_3 = self._get_index(self.index+3, mode_3)
-        self.memory[index_3] = 1 if val_1 < val_2 else 0
+        self._set_value(self.index+3, mode_3, 1 if val_1 < val_2 else 0)
         self.index += 4
 
     def _equal_to(self) -> None:
-        mode_1 = self._get_mode(self.memory[self.index], self.MASK_1)
-        mode_2 = self._get_mode(self.memory[self.index], self.MASK_2)
-        mode_3 = self._get_mode(self.memory[self.index], self.MASK_3)
+        mode_1, mode_2, mode_3 = self._get_modes(self.memory[self.index])
         val_1 = self._get_value(self.index+1, mode_1)
         val_2 = self._get_value(self.index+2, mode_2)
-        index_3 = self._get_index(self.index+3, mode_3)
-        self.memory[index_3] = 1 if val_1 == val_2 else 0
+        self._set_value(self.index+3, mode_3, 1 if val_1 == val_2 else 0)
         self.index += 4
 
     def _adjust_relative_base(self) -> None:
-        mode_1 = self._get_mode(self.memory[self.index], self.MASK_1)
-        val_1 = self._get_value(self.index+1, mode_1)
-        self.relative_base += val_1
+        mode, _, _ = self._get_modes(self.memory[self.index])
+        val = self._get_value(self.index+1, mode)
+        self.relative_base += val
         self.index += 2
 
     def _execute_instruction(self) -> None:
@@ -142,40 +138,12 @@ class Intcode:
         opcode = self._get_opcode(self.memory[self.index])
         if opcode == 99:
             return
-        elif opcode == 1:
-            self._add()
-        elif opcode == 2:
-            self._multiply()
-        elif opcode == 3:
-            self._input()
-        elif opcode == 4:
-            self._output()
-        elif opcode == 5:
-            self._jump_if_true()
-        elif opcode == 6:
-            self._jump_if_false()
-        elif opcode == 7:
-            self._less_than()
-        elif opcode == 8:
-            self._equal_to()
-        elif opcode == 9:
-            self._adjust_relative_base()
-        else:
-            raise Exception
+        self.opcode_to_func_map[opcode]()
 
     def execute(self) -> None:
         self.halt = False
         while self.memory[self.index] != 99 and not self.halt:
             self._execute_instruction()
-
-    def get_most_recent_output_value(self) -> int:
-        return self.output_values[-1]
-
-    def add_args(self, args: list[int]) -> None:
-        self.args.extend(args)
-
-    def popleft_output_value(self) -> int:
-        return self.output_values.pop(0)
 
     def finished_execution(self) -> bool:
         return self.memory[self.index] == 99

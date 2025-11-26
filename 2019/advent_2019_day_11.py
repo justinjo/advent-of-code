@@ -1,6 +1,6 @@
 from advent_day import AdventDay
 from .intcode import Intcode
-from collections import defaultdict
+from collections import defaultdict, deque
 
 class Tile:
     BLACK = 0
@@ -25,23 +25,24 @@ class Advent2019Day11(AdventDay):
         x = y = dir_i = 0
         tile_map = defaultdict(Tile)
         tile_map[(x, y)] = Tile(start_color)
+        queue_in=deque([start_color])
+        queue_out = deque()
         ic = Intcode(
             memory=self.input_int_array,
-            args=[start_color],
-            silence_output=True,
-            input_from_args_only=True,
+            queue_in=queue_in,
+            queue_out=queue_out,
         )
         while not ic.finished_execution():
             ic.execute()
-            color = ic.popleft_output_value()
+            color = queue_out.popleft()
             tile = tile_map[(x, y)]
             tile.paint(color)
             # change directions and add args
-            dir_change = 1 if ic.popleft_output_value() else -1
+            dir_change = 1 if queue_out.popleft() else -1
             dir_i = (dir_i + dir_change) % len(self.DIRECTIONS)
             x += self.DIRECTIONS[dir_i][0]
             y += self.DIRECTIONS[dir_i][1]
-            ic.add_args([tile_map[(x, y)].color])
+            queue_in.append(tile_map[(x, y)].color)
         return tile_map
 
     def print_tile_map(self, tile_map: dict[tuple[int, int], Tile]) -> None:
@@ -69,7 +70,7 @@ class Advent2019Day11(AdventDay):
     def part_two(self) -> str:
         self._convert_input_to_int()
         self.print_tile_map(self.paint_tiles(Tile.WHITE))
-        return ''
+        return 'See above'
 
 
 Advent2019Day11().run()
