@@ -23,10 +23,10 @@ class Advent2019Day14(AdventDay):
             }
         return reaction_map
 
-    def part_one(self) -> int:
+    def get_ore_for_fuel(self, fuel_amt: int = 1) -> int:
         ore = 0
         reaction_map = self.build_reaction_map()
-        reaction_stack: list[ChemicalAmount] = [(1, 'FUEL')]
+        reaction_stack: list[ChemicalAmount] = [(fuel_amt, 'FUEL')]
         chemical_bank = defaultdict(int)
         while reaction_stack:
             chem_amt, chemical = reaction_stack.pop()
@@ -48,8 +48,24 @@ class Advent2019Day14(AdventDay):
                 chemical_bank[chemical] += (reaction_amt * num_reactions) - chem_amt
         return ore
 
+    def part_one(self) -> int:
+        return self.get_ore_for_fuel()
+
     def part_two(self) -> int:
-        ...
+        ore_limit = 1000000000000
+        fuel_amt = 1
+        for _ in range(100): # zip zap zoom
+            sub_amt = 1
+            while self.get_ore_for_fuel(fuel_amt) > ore_limit:
+                fuel_amt -= sub_amt
+                sub_amt *= 2
+            add_amt = 1
+            while self.get_ore_for_fuel(fuel_amt) < ore_limit:
+                fuel_amt += add_amt
+                add_amt *= 2
+        while self.get_ore_for_fuel(fuel_amt) > ore_limit:
+            fuel_amt -= 1
+        return fuel_amt
 
 
 Advent2019Day14().run()
