@@ -132,7 +132,7 @@ class Droid:
 
     def search(self) -> None:
         prev_move = next_move = None
-        while not self.oxygen_coords: # or self.unexplored_coord_state_map: - if fully exploring
+        while not self.oxygen_coords or self.unexplored_coord_state_map:
             next_move = self.search_one(prev_move)
             if not next_move:
                 next_coord = next(iter(self.unexplored_coord_state_map))
@@ -146,6 +146,27 @@ class Droid:
     def oxygen_distance(self) -> int:
         return self.coord_map[self.oxygen_coords].distance
 
+    def fill_oxygen(self) -> int:
+        fill_coords = [self.oxygen_coords]
+        visited = set()
+        minutes = -1
+        while fill_coords:
+            next_layer = []
+            while fill_coords:
+                x, y = fill_coords.pop()
+                for x_d, y_d in self.MOVEMENT_TO_COORD_MAP.values():
+                    next_coord = (x + x_d, y + y_d)
+                    if (
+                        next_coord not in visited
+                        and next_coord in self.coord_map
+                        and self.coord_map[next_coord].tile == TileType.EMPTY
+                    ):
+                        next_layer.append(next_coord)
+                        visited.add(next_coord)
+            fill_coords = next_layer
+            minutes += 1
+        return minutes
+
 
 class Advent2019Day15(AdventDay):
 
@@ -156,7 +177,10 @@ class Advent2019Day15(AdventDay):
         return droid.oxygen_distance()
 
     def part_two(self) -> int:
-        ...
+        self._convert_input_to_int()
+        droid = Droid(ic_program=self.input_int_array)
+        droid.search()
+        return droid.fill_oxygen()
 
 
 Advent2019Day15().run()
