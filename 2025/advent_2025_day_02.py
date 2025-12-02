@@ -11,31 +11,35 @@ class Advent2025Day02(AdventDay):
             ranges.append((int(lo), int(hi)))
         return ranges
 
-    def get_next_invalid_id(self, id: int) -> int:
-        # input must be invalid id: even # digits, pattern repeated twice
+    def get_next_invalid_id(self, id: int, repeats: int) -> int:
+        # input must be invalid id: pattern repeated x times
         id_str = str(id)
-        sequence = int(id_str[:len(id_str) // 2])
-        return int(str(sequence + 1) * 2)
+        sequence = int(id_str[:len(id_str) // repeats])
+        return int(str(sequence + 1) * repeats)
 
-    def get_lowest_invalid_id_gte_length(self, length: int) -> int:
-        if length % 2:
-            length += 1 # invalid ids must be even
-        sequence = '1' + '0' * ((length // 2) - 1)
-        return int(sequence * 2)
+    def get_lowest_invalid_id_leq_length(self, id_len: int, repeats: int) -> int:
+        while id_len % repeats:
+            id_len -= 1
+        sequence = '1' + '0' * ((id_len // repeats) - 1)
+        return int(sequence * repeats)
 
-    def part_one(self) -> int:
-        invalid_ids = []
-        ranges = self.parse_input()
+    def sum_invalid_ids(self, ranges: list[tuple[int, int]], lock_repeats: bool = True) -> int:
+        invalid_ids = set()
         for lo, hi in ranges:
-            id = self.get_lowest_invalid_id_gte_length(len(str(lo)))
-            while id <= hi:
-                if id >= lo:
-                    invalid_ids.append(id)
-                id = self.get_next_invalid_id(id)
+            max_repeats = 2 if lock_repeats else len(str(hi))
+            for repetitions in range(2, max_repeats + 1):
+                id = self.get_lowest_invalid_id_leq_length(len(str(lo)), repetitions)
+                while id <= hi:
+                    if id >= lo:
+                        invalid_ids.add(id)
+                    id = self.get_next_invalid_id(id, repetitions)
         return sum([int(i) for i in invalid_ids])
 
+    def part_one(self) -> int:
+        return self.sum_invalid_ids(self.parse_input())
+
     def part_two(self) -> int:
-        ...
+        return self.sum_invalid_ids(self.parse_input(), lock_repeats=False)
 
 
 Advent2025Day02().run()
