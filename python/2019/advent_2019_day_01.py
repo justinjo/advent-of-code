@@ -1,27 +1,24 @@
-from advent_day import AdventDay
+def fuel_calc(mass: int) -> int:
+    return mass // 3 - 2
 
-class Advent2019Day01(AdventDay):
+def part_one(input_arr: list[str]) -> int:
+    arr = [int(x) for x in input_arr]
+    return sum([fuel_calc(mass) for mass in arr])
 
-    def _fuel_calc(self, mass: int) -> int:
-        return mass//3 - 2
-
-    def part_one(self) -> int:
-        self._convert_input_to_int()
-        return sum([self._fuel_calc(mass) for mass in self.input_int_array])
-
-    def part_two(self) -> int:
-        self._convert_input_to_int()
-        total_fuel = 0
+def part_two(input_arr: list[str]) -> int:
+    arr = [int(x) for x in input_arr]
+    total_fuel = 0
+    for mass in arr:
         mass_fuel = 0
-        incremental_fuel = 0
-        for mass in self.input_int_array:
-            incremental_fuel = self._fuel_calc(mass)
-            while incremental_fuel > 0:
-                mass_fuel += incremental_fuel
-                incremental_fuel = self._fuel_calc(incremental_fuel)
-            total_fuel += mass_fuel
-            incremental_fuel = mass_fuel = 0
-        return total_fuel
+        incremental_fuel = fuel_calc(mass)
+        while incremental_fuel > 0:
+            mass_fuel += incremental_fuel
+            incremental_fuel = fuel_calc(incremental_fuel)
+        total_fuel += mass_fuel
+    return total_fuel
 
+input_arr: list[str] = open('advent_2019_day_01.txt').read().splitlines()
 
-Advent2019Day01().run()
+print('Advent of Code 2019 - Day 01')
+print(f'Part One: {part_one(input_arr)}')
+print(f'Part Two: {part_two(input_arr)}')
