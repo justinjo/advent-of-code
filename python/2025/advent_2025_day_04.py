@@ -1,49 +1,43 @@
-from advent_day import AdventDay
+NEIGHBOR_COORDS = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
 
-class Advent2025Day04(AdventDay):
+def get_accessible_rolls(grid: list[str]) -> set[tuple[int, int]]:
+    rolls = set()
+    for y in range(len(grid)):
+        for x in range(len(grid[0])):
+            if grid[y][x] != '@':
+                continue
+            neighbors = 0
+            for xd, yd in NEIGHBOR_COORDS:
+                if 0 <= x + xd < len(grid[0]) and 0 <= y + yd < len(grid):
+                    neighbors += 1 if grid[y+yd][x+xd] == '@' else 0
+            if neighbors < 4:
+                rolls.add((x, y))
+    return rolls
 
-    def list_accessible_rolls(self, grid: list[str]) -> list[tuple[int, int]]:
-        ar = []
-        for y in range(len(grid)):
-            for x in range(len(grid[0])):
-                if grid[y][x] != '@':
-                    continue
-                neighbors = 0
-                for y_d in range(-1, 2):
-                    for x_d in range(-1, 2):
-                        if y_d == x_d == 0:
-                            continue
-                        if 0 <= x+x_d < len(grid[0]) and 0 <= y+y_d < len(grid):
-                            neighbors += 1 if grid[y+y_d][x+x_d] == '@' else 0
-                if neighbors < 4:
-                    ar.append((x, y))
-        return ar
+def remove_rolls(grid: list[str], rolls: set[tuple[int, int]]) -> list[str]:
+    new_grid = []
+    for y in range(len(grid)):
+        new_line = ''
+        for x in range(len(grid[0])):
+            new_line += 'x' if (x, y) in rolls else grid[y][x]
+        new_grid.append(new_line)
+    return new_grid
 
-    def remove_rolls(self, grid: list[str], rolls: list[tuple[int, int]]):
-        new_grid = []
-        roll_set = set(rolls)
-        for y in range(len(grid)):
-            new_line = ''
-            for x in range(len(grid[0])):
-                new_line += 'x' if (x, y) in roll_set else grid[y][x]
-            new_grid.append(new_line)
-        return new_grid
+def part_one(input_arr: list[str]) -> int:
+    return len(get_accessible_rolls(input_arr))
 
-    def count_accessible_rolls(self, grid: list[str]) -> int:
-        return len(self.list_accessible_rolls(grid))
+def part_two(input_arr: list[str]) -> int:
+    removed = 0
+    grid = input_arr
+    accessible_rolls = get_accessible_rolls(grid)
+    while accessible_rolls:
+        grid = remove_rolls(grid, accessible_rolls)
+        removed += len(accessible_rolls)
+        accessible_rolls = get_accessible_rolls(grid)
+    return removed
 
-    def part_one(self) -> int:
-        return self.count_accessible_rolls(self.input_str_array)
+input_arr: list[str] = open('advent_2025_day_04.txt').read().splitlines()
 
-    def part_two(self) -> int:
-        removed = 0
-        grid = self.input_str_array
-        accessible_rolls = self.list_accessible_rolls(grid)
-        while accessible_rolls:
-            grid = self.remove_rolls(grid, accessible_rolls)
-            removed += len(accessible_rolls)
-            accessible_rolls = self.list_accessible_rolls(grid)
-        return removed
-
-
-Advent2025Day04().run()
+print('Advent of Code 2025 - Day 04')
+print(f'Part One: {part_one(input_arr)}')
+print(f'Part Two: {part_two(input_arr)}')

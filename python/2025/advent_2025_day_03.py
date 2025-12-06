@@ -1,24 +1,24 @@
-from advent_day import AdventDay
+def sum_joltage(input_arr: list[str], digits: int = 2) -> int:
+    total_joltage = 0 # should be doing monotonic stacks but lazy
+    for battery in input_arr:
+        i = joltage = 0
+        arr = [int(x) for x in list(battery)]
+        for t in range(digits-1,-1,-1):
+            subarr = arr[i:len(arr)-t] # use len to prevent arr[x:0]
+            max_digit = max(subarr)
+            i += subarr.index(max_digit) + 1
+            joltage = joltage * 10 + max_digit
+        total_joltage += joltage
+    return total_joltage
 
-class Advent2025Day03(AdventDay):
+def part_one(input_arr: list[str]) -> int:
+    return sum_joltage(input_arr)
 
-    def sum_joltage(self, digits: int = 2) -> int:
-        joltage = 0 # should be doing monotonic stacks but lazy
-        for s in self.input_str_array:
-            i = j = 0
-            arr = [int(x) for x in list(s)]
-            for t in range(digits-1,-1,-1):
-                subarr = arr[i:len(arr)-t] # use len to prevent arr[x:0]
-                b = max(subarr)
-                i += subarr.index(b) + 1
-                j = j * 10 + b
-            joltage += j
-        return joltage
+def part_two(input_arr: list[str]) -> int:
+    return sum_joltage(input_arr, digits=12)
 
-    def part_one(self) -> int:
-        return self.sum_joltage()
+input_arr: list[str] = open('advent_2025_day_03.txt').read().splitlines()
 
-    def part_two(self) -> int:
-        return self.sum_joltage(12)
-
-Advent2025Day03().run()
+print('Advent of Code 2025 - Day 03')
+print(f'Part One: {part_one(input_arr)}')
+print(f'Part Two: {part_two(input_arr)}')

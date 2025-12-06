@@ -1,28 +1,25 @@
-from advent_day import AdventDay
+def part_one(input_arr: list[str]) -> int:
+    password = 0
+    dial = 50
+    for rotation in input_arr:
+        dial += int(rotation[1:]) if rotation[0] == 'R' else -int(rotation[1:])
+        password += 1 if dial % 100 == 0 else 0
+    return password
 
-class Advent2025Day01(AdventDay):
+def part_two(input_arr: list[str]) -> int:
+    password = 0
+    dial = 50
+    for rotation in input_arr:
+        delta = int(rotation[1:]) if rotation[0] == 'R' else -int(rotation[1:])
+        password += abs((dial + delta) // 100)
+        if delta < 0:
+            password -= 1 if dial == 0 else 0
+            password += 1 if (dial + delta) % 100 == 0 else 0
+        dial = (dial + delta) % 100
+    return password
 
-    def part_one(self) -> int:
-        password = 0
-        dial = 50
-        for rotation in self.input_str_array:
-            dial += int(rotation[1:]) if rotation[0] == 'R' else -int(rotation[1:])
-            password += 1 if dial % 100 == 0 else 0
-        return password
+input_arr: list[str] = open('advent_2025_day_01.txt').read().splitlines()
 
-    def part_two(self) -> int:
-        password = 0
-        dial = 50
-        for rotation in self.input_str_array:
-            delta = int(rotation[1:]) if rotation[0] == 'R' else -int(rotation[1:])
-            if rotation[0] == 'R':
-                password += (dial + delta) // 100
-            else:
-                password += -((dial + delta) // 100)
-                password -= 1 if dial == 0 else 0
-                password += 1 if (dial + delta) % 100 == 0 else 0
-            dial = (dial + delta) % 100
-        return password
-
-
-Advent2025Day01().run()
+print('Advent of Code 2025 - Day 01')
+print(f'Part One: {part_one(input_arr)}')
+print(f'Part Two: {part_two(input_arr)}')
