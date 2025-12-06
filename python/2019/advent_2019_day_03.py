@@ -1,6 +1,7 @@
 def get_steps(turn: str) -> int:
     return int(turn[1:])
 
+
 def get_coord(origin: tuple[int, int], cardinality: str, steps: int) -> tuple[int, int]:
     x, y = origin
     if cardinality == "R":
@@ -9,17 +10,19 @@ def get_coord(origin: tuple[int, int], cardinality: str, steps: int) -> tuple[in
         return (x, y + steps)
     elif cardinality == "L":
         return (x - steps, y)
-    else: # cardinality == "D":
+    else:  # cardinality == "D":
         return (x, y - steps)
+
 
 def manhattan_distance(coord: tuple[int, int]) -> int:
     return abs(coord[0]) + abs(coord[1])
 
+
 def part_one(input_arr: list[str]) -> int:
-    wire_1, wire_2 = [l.split(',') for l in input_arr]
+    wire_1, wire_2 = [l.split(",") for l in input_arr]
     visited_coords = set()
     coord = (0, 0)
-    min_distance = float('inf')
+    min_distance = float("inf")
 
     # map out wire_1's path
     for turn in wire_1:
@@ -41,13 +44,14 @@ def part_one(input_arr: list[str]) -> int:
 
     return int(min_distance)
 
+
 def part_two(input_arr: list[str]) -> int:
-    wire_1, wire_2 = [l.split(',') for l in input_arr]
+    wire_1, wire_2 = [l.split(",") for l in input_arr]
     # maps coord tuple to # of steps wire_1 took to arrive there
     visited_coords = {}
     total_steps = 0
     coord = (0, 0)
-    min_steps = float('inf')
+    min_steps = float("inf")
 
     # map out wire_1's path
     for turn in wire_1:
@@ -73,8 +77,9 @@ def part_two(input_arr: list[str]) -> int:
 
     return int(min_steps)
 
-input_arr: list[str] = open('advent_2019_day_03.txt').read().splitlines()
 
-print('Advent of Code 2019 - Day 03')
-print(f'Part One: {part_one(input_arr)}')
-print(f'Part Two: {part_two(input_arr)}')
+input_arr: list[str] = open("advent_2019_day_03.txt").read().splitlines()
+
+print("Advent of Code 2019 - Day 03")
+print(f"Part One: {part_one(input_arr)}")
+print(f"Part Two: {part_two(input_arr)}")

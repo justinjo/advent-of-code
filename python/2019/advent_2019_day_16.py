@@ -1,5 +1,6 @@
 from advent_day import AdventDay
 
+
 class Advent2019Day16(AdventDay):
 
     sequence = [0, 1, 0, -1]
@@ -10,7 +11,7 @@ class Advent2019Day16(AdventDay):
             arr_i = 0
             offsets = next_i + 1
             while arr_i < len(arr):
-                seq_i = ((arr_i + 1) // offsets ) % len(self.sequence)
+                seq_i = ((arr_i + 1) // offsets) % len(self.sequence)
                 next_phase[next_i] += arr[arr_i] * self.sequence[seq_i]
                 arr_i += 1
             if next_phase[next_i] >= 0:
@@ -32,10 +33,9 @@ class Advent2019Day16(AdventDay):
         arr = self.split_input()
         for _ in range(100):
             arr = self.fft(arr)
-        return ''.join(str(a) for a in arr[:8])
+        return "".join(str(a) for a in arr[:8])
 
-    def part_two(self) -> int:
-        ...
+    def part_two(self) -> int: ...
 
 
 Advent2019Day16().run()

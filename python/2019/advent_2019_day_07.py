@@ -3,6 +3,7 @@ from .intcode import Intcode
 from collections import deque
 import itertools
 
+
 class Advent2019Day07(AdventDay):
     NUM_AMPS = 5
 
@@ -75,23 +76,23 @@ class Advent2019Day07(AdventDay):
                     queue_out=queue_out,
                 )
                 ic_map[i] = {
-                    'queue_in': queue_in,
-                    'queue_out': queue_out,
-                    'intcode': intcode,
+                    "queue_in": queue_in,
+                    "queue_out": queue_out,
+                    "intcode": intcode,
                 }
-            ic_map[0]['intcode'].execute()
+            ic_map[0]["intcode"].execute()
 
             i = 0
-            while not ic_map[num_settings-1]['intcode'].finished_execution():
+            while not ic_map[num_settings - 1]["intcode"].finished_execution():
                 next_i = (i + 1) % 5
-                output = ic_map[i]['queue_out'].popleft()
+                output = ic_map[i]["queue_out"].popleft()
 
-                ic_map[next_i]['queue_in'].append(output)
-                ic_map[next_i]['intcode'].execute()
+                ic_map[next_i]["queue_in"].append(output)
+                ic_map[next_i]["intcode"].execute()
 
                 i = next_i
 
-            max_output = max(ic_map[num_settings-1]['queue_out'][-1], max_output)
+            max_output = max(ic_map[num_settings - 1]["queue_out"][-1], max_output)
 
         return max_output
 

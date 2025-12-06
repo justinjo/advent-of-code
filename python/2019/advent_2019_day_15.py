@@ -9,21 +9,25 @@ import time
 
 type CoordType = tuple[int, int] | tuple
 
+
 class TileDisplay(Enum):
-    UNVISITED = '?'
-    EMPTY = ' '
-    WALL = '#'
+    UNVISITED = "?"
+    EMPTY = " "
+    WALL = "#"
+
 
 class TileType(IntEnum):
     WALL = 0
     EMPTY = 1
     OXYGEN = 2
 
+
 class Movement(IntEnum):
     NORTH = 1
     SOUTH = 2
     WEST = 3
     EAST = 4
+
 
 @dataclass
 class Coord:
@@ -67,21 +71,21 @@ class Droid:
     def print(self) -> None:
         x_lo = y_lo = -25
         x_hi = y_hi = 25
-        os.system('clear')
-        print('map')
+        os.system("clear")
+        print("map")
         for y in range(y_hi, y_lo - 1, -1):
-            line = ''
+            line = ""
             for x in range(x_lo, x_hi + 1):
                 if (x, y) == self.current_coord:
-                    line += 'X'
+                    line += "X"
                 elif y in (y_lo, y_hi) or x in (x_lo, x_hi):
-                    line += '+'
+                    line += "+"
                 elif (x, y) in self.coord_map:
-                    line += '#' if self.coord_map[(x, y)].tile == TileType.WALL else '.'
+                    line += "#" if self.coord_map[(x, y)].tile == TileType.WALL else "."
                 else:
-                    line += ' '
+                    line += " "
             print(line)
-        time.sleep(.01)
+        time.sleep(0.01)
         print()
 
     def move(self, direction: Movement) -> bool:
@@ -96,7 +100,8 @@ class Droid:
         if travel_coord not in self.coord_map:
             self.coord_map[travel_coord] = Coord(
                 travel_coord,
-                self.coord_map[(x, y)].distance + 1, # will never be used for calc if wall
+                self.coord_map[(x, y)].distance
+                + 1,  # will never be used for calc if wall
                 output,
             )
         else:
@@ -125,8 +130,8 @@ class Droid:
                     successful_move = direction
                 else:
                     self.unexplored_coord_state_map[self.current_coord] = {
-                        'direction': direction,
-                        'memory': deepcopy(self.ic.memory),
+                        "direction": direction,
+                        "memory": deepcopy(self.ic.memory),
                     }
         return successful_move
 
@@ -137,8 +142,8 @@ class Droid:
             if not next_move:
                 next_coord = next(iter(self.unexplored_coord_state_map))
                 self.current_coord = next_coord
-                self.ic.memory = self.unexplored_coord_state_map[next_coord]['memory']
-                next_move = self.unexplored_coord_state_map[next_coord]['direction']
+                self.ic.memory = self.unexplored_coord_state_map[next_coord]["memory"]
+                next_move = self.unexplored_coord_state_map[next_coord]["direction"]
                 del self.unexplored_coord_state_map[next_coord]
             self.move(next_move)
             prev_move = self.OPPOSING_MOVEMENT_MAP[next_move] if next_move else None

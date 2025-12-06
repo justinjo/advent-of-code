@@ -2,6 +2,7 @@ from advent_day import AdventDay
 from .intcode import Intcode
 from collections import deque
 
+
 class Advent2019Day09(AdventDay):
 
     def part_one(self) -> int:

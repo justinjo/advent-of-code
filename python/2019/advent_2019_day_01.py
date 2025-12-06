@@ -1,9 +1,11 @@
 def fuel_calc(mass: int) -> int:
     return mass // 3 - 2
 
+
 def part_one(input_arr: list[str]) -> int:
     arr = [int(x) for x in input_arr]
     return sum([fuel_calc(mass) for mass in arr])
+
 
 def part_two(input_arr: list[str]) -> int:
     arr = [int(x) for x in input_arr]
@@ -17,8 +19,9 @@ def part_two(input_arr: list[str]) -> int:
         total_fuel += mass_fuel
     return total_fuel
 
-input_arr: list[str] = open('advent_2019_day_01.txt').read().splitlines()
 
-print('Advent of Code 2019 - Day 01')
-print(f'Part One: {part_one(input_arr)}')
-print(f'Part Two: {part_two(input_arr)}')
+input_arr: list[str] = open("advent_2019_day_01.txt").read().splitlines()
+
+print("Advent of Code 2019 - Day 01")
+print(f"Part One: {part_one(input_arr)}")
+print(f"Part Two: {part_two(input_arr)}")

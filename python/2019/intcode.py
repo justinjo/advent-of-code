@@ -1,6 +1,7 @@
 from collections import defaultdict, deque
 from enum import IntEnum
 
+
 class Mode(IntEnum):
     POSITION = 0
     IMMEDIATE = 1
@@ -57,7 +58,7 @@ class Intcode:
             return index
         elif mode == Mode.RELATIVE:
             return self.memory[index] + self.relative_base
-        raise Exception('Mode not supported')
+        raise Exception("Mode not supported")
 
     def _get_value(self, index: int, mode: int) -> int:
         return self.memory[self._get_index(index, mode)]
@@ -67,16 +68,16 @@ class Intcode:
 
     def _add(self) -> None:
         mode_1, mode_2, mode_3 = self._get_modes(self.memory[self.index])
-        val_1 = self._get_value(self.index+1, mode_1)
-        val_2 = self._get_value(self.index+2, mode_2)
-        self._set_value(self.index+3, mode_3, val_1 + val_2)
+        val_1 = self._get_value(self.index + 1, mode_1)
+        val_2 = self._get_value(self.index + 2, mode_2)
+        self._set_value(self.index + 3, mode_3, val_1 + val_2)
         self.index += 4
 
     def _multiply(self) -> None:
         mode_1, mode_2, mode_3 = self._get_modes(self.memory[self.index])
-        val_1 = self._get_value(self.index+1, mode_1)
-        val_2 = self._get_value(self.index+2, mode_2)
-        self._set_value(self.index+3, mode_3, val_1 * val_2)
+        val_1 = self._get_value(self.index + 1, mode_1)
+        val_2 = self._get_value(self.index + 2, mode_2)
+        self._set_value(self.index + 3, mode_3, val_1 * val_2)
         self.index += 4
 
     def _input(self) -> None:
@@ -87,14 +88,14 @@ class Intcode:
         elif self.queue_in:
             val = self.queue_in.popleft()
         else:
-            self.halt = True # wait for next input from self.queue_in
+            self.halt = True  # wait for next input from self.queue_in
             return
-        self._set_value(self.index+1, mode, int(val))
+        self._set_value(self.index + 1, mode, int(val))
         self.index += 2
 
     def _output(self) -> None:
         mode, _, _ = self._get_modes(self.memory[self.index])
-        val = self._get_value(self.index+1, mode)
+        val = self._get_value(self.index + 1, mode)
         if self.use_cli_io:
             print(val)
         self.queue_out.append(val)
@@ -102,39 +103,39 @@ class Intcode:
 
     def _jump_if_true(self) -> None:
         mode_1, mode_2, _ = self._get_modes(self.memory[self.index])
-        val_1 = self._get_value(self.index+1, mode_1)
-        val_2 = self._get_value(self.index+2, mode_2)
+        val_1 = self._get_value(self.index + 1, mode_1)
+        val_2 = self._get_value(self.index + 2, mode_2)
         self.index = val_2 if val_1 else self.index + 3
 
     def _jump_if_false(self) -> None:
         mode_1, mode_2, _ = self._get_modes(self.memory[self.index])
-        val_1 = self._get_value(self.index+1, mode_1)
-        val_2 = self._get_value(self.index+2, mode_2)
+        val_1 = self._get_value(self.index + 1, mode_1)
+        val_2 = self._get_value(self.index + 2, mode_2)
         self.index = val_2 if val_1 == 0 else self.index + 3
 
     def _less_than(self) -> None:
         mode_1, mode_2, mode_3 = self._get_modes(self.memory[self.index])
-        val_1 = self._get_value(self.index+1, mode_1)
-        val_2 = self._get_value(self.index+2, mode_2)
-        self._set_value(self.index+3, mode_3, 1 if val_1 < val_2 else 0)
+        val_1 = self._get_value(self.index + 1, mode_1)
+        val_2 = self._get_value(self.index + 2, mode_2)
+        self._set_value(self.index + 3, mode_3, 1 if val_1 < val_2 else 0)
         self.index += 4
 
     def _equal_to(self) -> None:
         mode_1, mode_2, mode_3 = self._get_modes(self.memory[self.index])
-        val_1 = self._get_value(self.index+1, mode_1)
-        val_2 = self._get_value(self.index+2, mode_2)
-        self._set_value(self.index+3, mode_3, 1 if val_1 == val_2 else 0)
+        val_1 = self._get_value(self.index + 1, mode_1)
+        val_2 = self._get_value(self.index + 2, mode_2)
+        self._set_value(self.index + 3, mode_3, 1 if val_1 == val_2 else 0)
         self.index += 4
 
     def _adjust_relative_base(self) -> None:
         mode, _, _ = self._get_modes(self.memory[self.index])
-        val = self._get_value(self.index+1, mode)
+        val = self._get_value(self.index + 1, mode)
         self.relative_base += val
         self.index += 2
 
     def _execute_instruction(self) -> None:
         if self.index < 0:
-            raise Exception(f'Index cannot be negative: {self.index}')
+            raise Exception(f"Index cannot be negative: {self.index}")
         opcode = self._get_opcode(self.memory[self.index])
         if opcode == 99:
             return

@@ -1,60 +1,33 @@
-from advent_day import AdventDay
 from collections import Counter
 
-class Advent2019Day04(AdventDay):
 
-    def _valid_code(self, code: int):
-        has_adjacent = False
-        is_increasing = True
-        prev_digit = float('inf')
-        while code:
-            digit = code % 10
-            if prev_digit == digit:
-                has_adjacent = True
-            if prev_digit < digit:
-                is_increasing = False
-                break
-            code //= 10
-            prev_digit = digit
-        return has_adjacent and is_increasing
-
-    def _valid_code_2(self, code: int):
-        c = Counter()
-        has_adjacent = False
-        is_increasing = True
-        prev_digit = float('inf')
-        while code:
-            digit = code % 10
-            c.update([digit])
-            if prev_digit < digit:
-                is_increasing = False
-                break
-            code //= 10
-            prev_digit = digit
-        for _, count in c.items():
-            if count == 2:
-                has_adjacent = True
-        return has_adjacent and is_increasing
-
-    def _parse_input(self) -> tuple[int, int]:
-        low, hi = self.input_str_array[0].split('-')
-        return (int(low), int(hi))
-
-    def part_one(self) -> int:
-        num = 0
-        low, hi = self._parse_input()
-        for i in range(low, hi+1):
-            if self._valid_code(i):
-                num += 1
-        return num
-
-    def part_two(self) -> int:
-        num = 0
-        low, hi = self._parse_input()
-        for i in range(low, hi+1):
-            if self._valid_code_2(i):
-                num += 1
-        return num
+def is_valid_password(password: int, exact_pair: bool = False) -> bool:
+    counter = Counter(str(password))
+    has_adjacent = False
+    is_increasing = True
+    prev_digit = "0"  # passwords don't start with zero
+    for digit in str(password):
+        if prev_digit > digit:
+            is_increasing = False
+        prev_digit = digit
+    for _, digit_count in counter.items():
+        if (not exact_pair and digit_count >= 2) or (exact_pair and digit_count == 2):
+            has_adjacent = True
+    return has_adjacent and is_increasing
 
 
-Advent2019Day04().run()
+def part_one(input_arr: list[str]) -> int:
+    lo, hi = [int(x) for x in input_arr[0].split("-")]
+    return sum([is_valid_password(pw) for pw in range(lo, hi + 1)])
+
+
+def part_two(input_arr: list[str]) -> int:
+    lo, hi = [int(x) for x in input_arr[0].split("-")]
+    return sum([is_valid_password(pw, exact_pair=True) for pw in range(lo, hi + 1)])
+
+
+input_arr: list[str] = open("advent_2019_day_04.txt").read().splitlines()
+
+print("Advent of password 2019 - Day 04")
+print(f"Part One: {part_one(input_arr)}")
+print(f"Part Two: {part_two(input_arr)}")

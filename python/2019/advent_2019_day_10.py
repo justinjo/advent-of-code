@@ -1,9 +1,10 @@
 from advent_day import AdventDay
 import math
 
+
 class AsteroidMap:
-    ASTEROID = '#'
-    SPACE = '.'
+    ASTEROID = "#"
+    SPACE = "."
 
     def __init__(self, asteroid_map: list[str]) -> None:
         self.map = asteroid_map
@@ -15,7 +16,7 @@ class AsteroidMap:
     def _generate_slopes(self) -> None:
         # does not include (0, 1) or (1, 0)
         self.slope_set = set([0.0])
-        self.slopes = [] # list[tuple[int, int]]
+        self.slopes = []  # list[tuple[int, int]]
         self.slopes_dict = {}
         for r in range(1, self.rows):
             for c in range(1, self.cols):
@@ -88,14 +89,14 @@ class AsteroidMap:
     def print_seen(self) -> None:
         strings = []
         for row in range(self.rows):
-            row_str = ''
+            row_str = ""
             for col in range(self.cols):
                 if self.map[row][col] != self.ASTEROID:
-                    row_str += 'XX '
+                    row_str += "XX "
                     continue
                 num_asteroids = self.asteroids_seen(row, col)
-                row_str += str(num_asteroids).zfill(2) + ' '
-            row_str += '\n'
+                row_str += str(num_asteroids).zfill(2) + " "
+            row_str += "\n"
             strings.append(row_str)
         for s in strings:
             print(s)
@@ -111,9 +112,11 @@ class AsteroidMap:
         coords = self._sees_asteroid(row, col, rise, run)
         if coords:
             r, c = coords
-            self.map[r] = self.map[r][:c] + self.SPACE + self.map[r][c+1:]
+            self.map[r] = self.map[r][:c] + self.SPACE + self.map[r][c + 1 :]
             if self.strings:
-                self.strings[r] = self.strings[r][:8*c] + 'DESTROY ' + self.strings[r][8*c+8:]
+                self.strings[r] = (
+                    self.strings[r][: 8 * c] + "DESTROY " + self.strings[r][8 * c + 8 :]
+                )
         return coords
 
     def _get_slope_order(self) -> list[tuple[int, int]]:
@@ -147,11 +150,7 @@ class AsteroidMap:
         return ordered_slopes
 
     def destroy_asteroids(
-        self,
-        row: int,
-        col: int,
-        num_to_destroy: int,
-        should_print_map: bool = False
+        self, row: int, col: int, num_to_destroy: int, should_print_map: bool = False
     ) -> tuple[int, int]:
         # returns the coordinates of the final destroyed astroid
         destroyed_row = destroyed_col = num_destroyed = 0
@@ -171,28 +170,28 @@ class AsteroidMap:
 
     def _generate_print_map(self, row: int, col: int) -> None:
         for r in range(self.rows):
-            row_str = ''
+            row_str = ""
             for c in range(self.cols):
                 if self.map[r][c] != self.ASTEROID:
-                    row_str += '....... '
+                    row_str += "....... "
                     continue
-                elif (r == row and c == col):
-                    row_str += '_BASE__ '
+                elif r == row and c == col:
+                    row_str += "_BASE__ "
                     continue
                 if -0.001 < row - r < 0.001:
-                    row_str += '0.00000 '
+                    row_str += "0.00000 "
                 elif -0.001 < col - c < 0.001:
-                    row_str += 'INFINIT '
+                    row_str += "INFINIT "
                 else:
-                    if 0 < ((row-r)/(col-c)) < 10:
-                        row_str += f'{((row-r)/(col-c)):.5f}' + ' '
-                    elif 10 <= ((row-r)/(col-c)):
-                        row_str += f'{((row-r)/(col-c)):.4f}' + ' '
-                    elif -10 < ((row-r)/(col-c)) < 0:
-                        row_str += f'{((row-r)/(col-c)):.4f}' + ' '
+                    if 0 < ((row - r) / (col - c)) < 10:
+                        row_str += f"{((row-r)/(col-c)):.5f}" + " "
+                    elif 10 <= ((row - r) / (col - c)):
+                        row_str += f"{((row-r)/(col-c)):.4f}" + " "
+                    elif -10 < ((row - r) / (col - c)) < 0:
+                        row_str += f"{((row-r)/(col-c)):.4f}" + " "
                     else:
-                        row_str += f'{((row-r)/(col-c)):.3f}' + ' '
-            row_str += '\n'
+                        row_str += f"{((row-r)/(col-c)):.3f}" + " "
+            row_str += "\n"
             self.strings.append(row_str)
 
     def print_map(self, row: int, col: int) -> None:
