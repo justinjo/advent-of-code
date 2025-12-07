@@ -14,6 +14,19 @@ def fft(arr: list[int]) -> list[int]:
     return next_phase
 
 
+def fft_upper_half(arr: list[int]) -> list[int]:
+    # perform fft for only the upper half of an array. arr arg is array[len//2:]
+    next_phase = [0] * len(arr)
+    running_sum = 0
+    for i in range(len(arr) - 1, -1, -1):
+        running_sum += arr[i]
+        if running_sum >= 0 or running_sum % 10 == 0:
+            next_phase[i] = running_sum % 10
+        else:
+            next_phase[i] = 10 - (running_sum % 10)
+    return next_phase
+
+
 def part_one(input_arr: list[str]) -> str:
     arr = [int(x) for x in input_arr[0]]
     for _ in range(100):  # ~3 seconds
@@ -21,7 +34,13 @@ def part_one(input_arr: list[str]) -> str:
     return "".join(str(a) for a in arr[:8])
 
 
-def part_two(input_arr: list[str]) -> str: ...
+def part_two(input_arr: list[str]) -> str:
+    offset = int("".join(input_arr[0][:7]))  # offset is in upper half of array
+    arr = [int(x) for x in input_arr[0]] * (10000 // 2)  # take upper half of arr
+    offset -= len(arr)
+    for _ in range(100):  # ~12 seconds
+        arr = fft_upper_half(arr)
+    return "".join(str(a) for a in arr[offset : offset + 8])
 
 
 input_arr: list[str] = open("advent_2019_day_16.txt").read().splitlines()
