@@ -1,8 +1,7 @@
+from collections import Counter
+
+
 def part_one(input_arr: list[str]) -> int:
-    grid = {}
-    for row in range(len(input_arr)):
-        for col in range(len(input_arr[0])):
-            grid[(row, col)] = input_arr[row][col]
     beams = [(0, input_arr[0].find("S"))]
     splits = 0
     visited = set()
@@ -23,7 +22,23 @@ def part_one(input_arr: list[str]) -> int:
     return splits
 
 
-def part_two(input_arr: list[str]) -> int: ...
+def part_two(input_arr: list[str]) -> int:
+    beams = [(input_arr[0].find("S"), 1)]
+    total_timelines = row = 0
+    while row < len(input_arr):
+        timeline_counts = Counter()
+        while beams:
+            col, timelines = beams.pop()
+            if input_arr[row][col] == "^":
+                timeline_counts[col - 1] += timelines
+                timeline_counts[col + 1] += timelines
+            else:
+                timeline_counts[col] += timelines
+        for col in timeline_counts:
+            beams.append((col, timeline_counts[col]))
+        total_timelines = sum(timeline_counts.values())
+        row += 1
+    return total_timelines
 
 
 input_arr: list[str] = open("advent_2025_day_07.txt").read().splitlines()
