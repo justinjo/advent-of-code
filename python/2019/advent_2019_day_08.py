@@ -55,6 +55,6 @@ def part_two(input_arr: list[str]) -> str:
 
 input_arr: list[str] = open("advent_2019_day_08.txt").read().splitlines()
 
-print("Advent of password 2019 - Day 08")
+print("Advent of Code 2019 - Day 08")
 print(f"Part One: {part_one(input_arr)}")
 print(f"Part Two: {part_two(input_arr)}")
