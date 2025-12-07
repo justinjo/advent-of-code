@@ -1,77 +1,59 @@
-from advent_day import AdventDay
-from .intcode import Intcode
+from intcode import Intcode
 from collections import defaultdict, deque
 
-
-class Tile:
-    BLACK = 0
-    WHITE = 1
-
-    def __init__(self, color: int = BLACK) -> None:
-        self.color = color
-        self.history = []
-
-    def paint(self, color: int) -> None:
-        self.history.append(self.color)
-        self.color = color
-
-    def was_painted(self) -> bool:
-        return bool(self.history)
+DIRECTIONS: list[tuple[int, int]] = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+BLACK = 0
+WHITE = 1
 
 
-class Advent2019Day11(AdventDay):
-    DIRECTIONS: list[tuple[int, int]] = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+def paint_tiles(
+    memory: list[int],
+    start_color: int = BLACK,
+) -> dict[tuple[int, int], int]:
+    dir_i = 0
+    coord = (0, 0)
+    tile_map: dict[tuple[int, int], int] = defaultdict(int)
+    tile_map[coord] = start_color
 
-    def paint_tiles(self, start_color: int = Tile.BLACK) -> dict[tuple[int, int], Tile]:
-        x = y = dir_i = 0
-        tile_map = defaultdict(Tile)
-        tile_map[(x, y)] = Tile(start_color)
-        queue_in = deque([start_color])
-        queue_out = deque()
-        ic = Intcode(
-            memory=self.input_int_array,
-            queue_in=queue_in,
-            queue_out=queue_out,
-        )
-        while not ic.finished_execution():
-            ic.execute()
-            color = queue_out.popleft()
-            tile = tile_map[(x, y)]
-            tile.paint(color)
-            # change directions and add args
-            dir_change = 1 if queue_out.popleft() else -1
-            dir_i = (dir_i + dir_change) % len(self.DIRECTIONS)
-            x += self.DIRECTIONS[dir_i][0]
-            y += self.DIRECTIONS[dir_i][1]
-            queue_in.append(tile_map[(x, y)].color)
-        return tile_map
-
-    def print_tile_map(self, tile_map: dict[tuple[int, int], Tile]) -> None:
-        # sort coords by y val
-        coords = sorted(sorted(tile_map), key=lambda c: c[1], reverse=True)
-        min_x = min(coords)[0]
-        row = ""
-        prev_y = None
-        for x, y in coords:
-            if y != prev_y:  # new line
-                print(row)
-                row = ""
-                i = 0  # align all values when printing
-                while min_x + i < x:
-                    row += " "
-                    i += 1
-            row += "#" if tile_map[(x, y)].color == Tile.WHITE else " "
-            prev_y = y
-        print(row + "\n")
-
-    def part_one(self) -> int:
-        self._convert_input_to_int()
-        return len([t for t in self.paint_tiles().values() if t.was_painted()])
-
-    def part_two(self) -> str:
-        self._convert_input_to_int()
-        self.print_tile_map(self.paint_tiles(Tile.WHITE))
-        return "See above"
+    q_in = deque([start_color])
+    q_out = deque()
+    ic = Intcode(memory=memory, queue_in=q_in, queue_out=q_out)
+    while not ic.finished_execution():
+        ic.execute()
+        tile_map[coord] = q_out.popleft()  # color painted
+        dir_i += 1 if q_out.popleft() else -1  # direction change
+        dir_i %= len(DIRECTIONS)
+        coord = (coord[0] + DIRECTIONS[dir_i][0], coord[1] + DIRECTIONS[dir_i][1])
+        q_in.append(tile_map[coord])  # color seen
+    return tile_map
 
 
-Advent2019Day11().run()
+def print_tile_map(tile_map: dict[tuple[int, int], int]) -> None:
+    min_x = min(tile_map)[0]
+    max_x = max(tile_map)[0]
+    min_y = min(tile_map, key=lambda c: c[1])[1]
+    max_y = max(tile_map, key=lambda c: c[1])[1]
+    print_str = "\n"
+    for y in range(max_y, min_y - 1, -1):
+        for x in range(min_x, max_x + 1):
+            print_str += "#" if tile_map[(x, y)] == WHITE else " "
+        print_str += "\n"
+    print(print_str)
+
+
+def part_one(input_arr: list[str]) -> int:
+    memory = [int(x) for x in input_arr[0].split(",")]
+    return len(paint_tiles(memory))
+
+
+def part_two(input_arr: list[str]) -> str:
+    memory = [int(x) for x in input_arr[0].split(",")]
+    print_tile_map(paint_tiles(memory, start_color=WHITE))
+    return "See above"
+
+
+input_arr: list[str] = open("advent_2019_day_11.txt").read().splitlines()
+
+print("Advent of Code 2019 - Day 11")
+print(f"Part One: {part_one(input_arr)}")
+print(f"Part Two: {part_two(input_arr)}")
