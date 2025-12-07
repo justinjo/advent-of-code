@@ -1,34 +1,34 @@
-from advent_day import AdventDay
-
-class Advent2017Day03(AdventDay):
-
-    def _get_distance(self, target: int) -> int:
-        base = 1
-        while base ** 2 < target:
-            base += 2
-        curr = base ** 2
-        distance = base - 1
-        toggle = (base - 1) // 2
-        offset = -1
-        counter = 0
-        while curr != target:
-            distance += offset
-            curr -= 1
-            counter += 1
-            if counter % toggle == 0:
-                offset *= -1
-        return distance
-
-    def part_one(self) -> int:
-        self._convert_input_to_int()
-        target = self.input_int_array[0]
-        return self._get_distance(target)
-
-    def part_two(self) -> int:
-        ...
+def get_distance(target: int) -> int:
+    base = 1
+    while base**2 < target:
+        base += 2
+    curr = base**2
+    distance = base - 1
+    toggle = (base - 1) // 2
+    offset = -1
+    counter = 0
+    while curr != target:
+        distance += offset
+        curr -= 1
+        counter += 1
+        if counter % toggle == 0:
+            offset *= -1
+    return distance
 
 
-Advent2017Day03().run()
+def part_one(input_arr: list[str]) -> int:
+    return get_distance(int(input_arr[0]))
+
+
+def part_two(input_arr: list[str]) -> int: ...
+
+
+input_arr: list[str] = open("advent_2017_day_03.txt").read().splitlines()
+
+print("Advent of Code 2017 - Day 03")
+print(f"Part One: {part_one(input_arr)}")
+print(f"Part Two: {part_two(input_arr)}")
+
 
 """
 part 1 notes
