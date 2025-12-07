@@ -1,5 +1,4 @@
-from advent_day import AdventDay
-from .intcode import Intcode
+from intcode import Intcode
 from collections import deque
 from enum import Enum, IntEnum
 from dataclasses import dataclass
@@ -91,8 +90,8 @@ class Droid:
     def move(self, direction: Movement) -> bool:
         moved = False
         x, y = self.current_coord
-        x_d, y_d = self.MOVEMENT_TO_COORD_MAP[direction]
-        travel_coord = (x + x_d, y + y_d)
+        xd, yd = self.MOVEMENT_TO_COORD_MAP[direction]
+        travel_coord = (x + xd, y + yd)
         self.queue_in.append(direction)
         self.ic.execute()
         output = self.queue_out.popleft()
@@ -100,13 +99,12 @@ class Droid:
         if travel_coord not in self.coord_map:
             self.coord_map[travel_coord] = Coord(
                 travel_coord,
-                self.coord_map[(x, y)].distance
-                + 1,  # will never be used for calc if wall
+                self.coord_map[self.current_coord].distance + 1,
                 output,
             )
         else:
             self.coord_map[travel_coord].distance = min(
-                self.coord_map[(x, y)].distance + 1,
+                self.coord_map[self.current_coord].distance + 1,
                 self.coord_map[travel_coord].distance,
             )
 
@@ -159,11 +157,11 @@ class Droid:
             next_layer = []
             while fill_coords:
                 x, y = fill_coords.pop()
-                for x_d, y_d in self.MOVEMENT_TO_COORD_MAP.values():
-                    next_coord = (x + x_d, y + y_d)
+                for xd, yd in self.MOVEMENT_TO_COORD_MAP.values():
+                    next_coord = (x + xd, y + yd)
                     if (
-                        next_coord not in visited
-                        and next_coord in self.coord_map
+                        next_coord in self.coord_map
+                        and next_coord not in visited
                         and self.coord_map[next_coord].tile == TileType.EMPTY
                     ):
                         next_layer.append(next_coord)
@@ -173,19 +171,22 @@ class Droid:
         return minutes
 
 
-class Advent2019Day15(AdventDay):
-
-    def part_one(self) -> int:
-        self._convert_input_to_int()
-        droid = Droid(ic_program=self.input_int_array)
-        droid.search()
-        return droid.oxygen_distance()
-
-    def part_two(self) -> int:
-        self._convert_input_to_int()
-        droid = Droid(ic_program=self.input_int_array)
-        droid.search()
-        return droid.fill_oxygen()
+def part_one(input_arr: list[str]) -> int:
+    memory = [int(x) for x in input_arr[0].split(",")]
+    droid = Droid(ic_program=memory)
+    droid.search()
+    return droid.oxygen_distance()
 
 
-Advent2019Day15().run()
+def part_two(input_arr: list[str]) -> int:
+    memory = [int(x) for x in input_arr[0].split(",")]
+    droid = Droid(ic_program=memory)
+    droid.search()
+    return droid.fill_oxygen()
+
+
+input_arr: list[str] = open("advent_2019_day_15.txt").read().splitlines()
+
+print("Advent of Code 2019 - Day 15")
+print(f"Part One: {part_one(input_arr)}")
+print(f"Part Two: {part_two(input_arr)}")

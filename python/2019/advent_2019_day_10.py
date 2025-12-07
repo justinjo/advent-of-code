@@ -1,4 +1,3 @@
-from advent_day import AdventDay
 import math
 
 
@@ -201,20 +200,23 @@ class AsteroidMap:
             print(s)
 
 
-class Advent2019Day10(AdventDay):
-
-    def part_one(self) -> int:
-        am = AsteroidMap(self.input_str_array)
-        row, col = am.best_station_placement()
-        return am.asteroids_seen(row, col)
-
-    def part_two(self) -> int:
-        am = AsteroidMap(self.input_str_array)
-        r, c = am.best_station_placement()
-        row, col = am.destroy_asteroids(r, c, 200)
-        # i did this whole thing x=row, y=col
-        # problem statement has it the other way around...
-        return 100 * col + row
+def part_one(input_arr: list[str]) -> int:
+    am = AsteroidMap(input_arr)
+    row, col = am.best_station_placement()
+    return am.asteroids_seen(row, col)
 
 
-Advent2019Day10().run()
+def part_two(input_arr: list[str]) -> int:
+    am = AsteroidMap(input_arr)
+    r, c = am.best_station_placement()
+    row, col = am.destroy_asteroids(r, c, 200)
+    # i did this whole thing x=row, y=col
+    # problem statement has it the other way around...
+    return 100 * col + row
+
+
+input_arr: list[str] = open("advent_2019_day_10.txt").read().splitlines()
+
+print("Advent of Code 2019 - Day 10")
+print(f"Part One: {part_one(input_arr)}")
+print(f"Part Two: {part_two(input_arr)}")
