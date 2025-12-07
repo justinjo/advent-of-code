@@ -1,6 +1,6 @@
-from advent_day import AdventDay
-from datetime import datetime, timedelta
+from datetime import datetime
 from collections import Counter
+
 
 class Guard:
 
@@ -32,25 +32,24 @@ class Guard:
         minutes_slept = int(sleep_delta.total_seconds()) // 60
         self.minutes_asleep += minutes_slept
         for minute in range(
-            self.sleep_start.minute,
-            self.sleep_start.minute + minutes_slept
+            self.sleep_start.minute, self.sleep_start.minute + minutes_slept
         ):
             self.sleep_minutes[minute] += 1
         self.is_asleep = False
 
     def sleepiest_minute(self) -> int:
         minute = self.sleep_minutes.most_common(1)
-        return minute[0][0] if minute else -1 # -1 if guard hasn't slept
+        return minute[0][0] if minute else -1  # -1 if guard hasn't slept
 
-    def times_slept_on_sleepiest_minute(self) ->int:
+    def times_slept_on_sleepiest_minute(self) -> int:
         minute = self.sleepiest_minute()
         return self.sleep_minutes[minute]
 
 
 class Scheduler:
-    STARTS = 'Guard begins shift'
-    SLEEPS = 'falls asleep'
-    WAKES = 'wakes up'
+    STARTS = "Guard begins shift"
+    SLEEPS = "falls asleep"
+    WAKES = "wakes up"
     BASE_DATETIME = datetime(1, 1, 1)
 
     def __init__(self, events: list[dict[str, int | str | datetime]]) -> None:
@@ -65,9 +64,9 @@ class Scheduler:
             self._process_event(event)
 
     def _process_event(self, event: dict[str, int | str | datetime]) -> None:
-        dt: datetime = event['datetime'] # type: ignore
-        if event['action'] == self.STARTS:
-            guard_id: int = event['guard'] # type: ignore
+        dt: datetime = event["datetime"]  # type: ignore
+        if event["action"] == self.STARTS:
+            guard_id: int = event["guard"]  # type: ignore
             if guard_id not in self.guards:
                 self.guards[guard_id] = Guard(guard_id)
 
@@ -75,10 +74,10 @@ class Scheduler:
             self.guard_on_watch.begin_shift(dt)
             self.is_guard_on_watch = True
 
-        elif event['action'] == self.SLEEPS:
+        elif event["action"] == self.SLEEPS:
             self.guard_on_watch.fall_asleep(dt)
 
-        elif event['action'] == self.WAKES:
+        elif event["action"] == self.WAKES:
             self.guard_on_watch.wake_up(dt)
 
     def get_sleepiest_guard(self) -> Guard:
@@ -91,44 +90,52 @@ class Scheduler:
     def get_frequently_sleepy_guard(self) -> Guard:
         sleepiest = Guard()
         for guard in self.guards.values():
-            if guard.times_slept_on_sleepiest_minute() > sleepiest.times_slept_on_sleepiest_minute():
+            if (
+                guard.times_slept_on_sleepiest_minute()
+                > sleepiest.times_slept_on_sleepiest_minute()
+            ):
                 sleepiest = guard
         return sleepiest
 
 
-class Advent2018Day04(AdventDay):
-
-    def _parse_input(self) -> None:
-        self.events = []
-        for line in self.input_str_array:
-            guard = 0
-            timestamp, action = line[1:].split('] ')
-            dt = datetime.fromisoformat(timestamp)
-            if action.split(' ')[0] == 'Guard':
-                guard = int(action.split(' ')[1][1:])
-                action = Scheduler.STARTS
-            event = {
-                'timestamp': timestamp,
-                'datetime': dt,
-                'action': action,
-                'guard': guard, # 0 is empty
-            }
-            self.events.append(event)
-        self.events.sort(key=lambda e: e['timestamp'])
-
-    def part_one(self) -> int:
-        self._parse_input()
-        scheduler = Scheduler(self.events)
-        scheduler.run_schedule()
-        guard = scheduler.get_sleepiest_guard()
-        return guard.id * guard.sleepiest_minute()
-
-    def part_two(self) -> int:
-        # self._parse_input()
-        scheduler = Scheduler(self.events)
-        scheduler.run_schedule()
-        guard = scheduler.get_frequently_sleepy_guard()
-        return guard.id * guard.sleepiest_minute()
+def extract_and_sort_events(input_arr: list[str]) -> list[dict]:
+    events = []
+    for line in input_arr:
+        guard = 0
+        timestamp, action = line[1:].split("] ")
+        dt = datetime.fromisoformat(timestamp)
+        if action.split(" ")[0] == "Guard":
+            guard = int(action.split(" ")[1][1:])
+            action = Scheduler.STARTS
+        event = {
+            "timestamp": timestamp,
+            "datetime": dt,
+            "action": action,
+            "guard": guard,  # 0 is empty
+        }
+        events.append(event)
+    events.sort(key=lambda e: e["timestamp"])
+    return events
 
 
-Advent2018Day04().run()
+def part_one(input_arr: list[str]) -> int:
+    events = extract_and_sort_events(input_arr)
+    scheduler = Scheduler(events)
+    scheduler.run_schedule()
+    guard = scheduler.get_sleepiest_guard()
+    return guard.id * guard.sleepiest_minute()
+
+
+def part_two(input_arr: list[str]) -> int:
+    events = extract_and_sort_events(input_arr)
+    scheduler = Scheduler(events)
+    scheduler.run_schedule()
+    guard = scheduler.get_frequently_sleepy_guard()
+    return guard.id * guard.sleepiest_minute()
+
+
+input_arr: list[str] = open("advent_2018_day_04.txt").read().splitlines()
+
+print("Advent of Code 2018 - Day 04")
+print(f"Part One: {part_one(input_arr)}")
+print(f"Part Two: {part_two(input_arr)}")

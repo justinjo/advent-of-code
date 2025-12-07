@@ -1,19 +1,20 @@
-from advent_day import AdventDay
-
-class Advent2018Day01(AdventDay):
-
-    def part_one(self) -> int:
-        self._convert_input_to_int()
-        return sum(self.input_int_array)
-
-    def part_two(self) -> int:
-        seen = set()
-        freq = i = 0
-        while freq not in seen:
-            seen.add(freq)
-            freq += self.input_int_array[i]
-            i = (i + 1) % self.input_length
-        return freq
+def part_one(input_arr: list[str]) -> int:
+    return sum([int(x) for x in input_arr])
 
 
-Advent2018Day01().run()
+def part_two(input_arr: list[str]) -> int:
+    seen = set()
+    freq = i = 0
+    arr = [int(x) for x in input_arr]
+    while freq not in seen:
+        seen.add(freq)
+        freq += arr[i]
+        i = (i + 1) % len(arr)
+    return freq
+
+
+input_arr: list[str] = open("advent_2018_day_01.txt").read().splitlines()
+
+print("Advent of Code 2018 - Day 01")
+print(f"Part One: {part_one(input_arr)}")
+print(f"Part Two: {part_two(input_arr)}")
