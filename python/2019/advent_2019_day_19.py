@@ -1,64 +1,58 @@
-from advent_day import AdventDay
-from .intcode import Intcode
+from intcode import Intcode
 from collections import deque
 
 
-class Advent2019Day19(AdventDay):
+def print_beam(memory: list[int], rows: int, cols: int) -> None:
+    q_out = deque()
+    beamed = set()
+    for y in range(cols):
+        for x in range(rows):
+            Intcode(memory=memory, queue_in=deque([x, y]), queue_out=q_out).execute()
+            if q_out.popleft():
+                beamed.add((x, y))
+    max_x, max_y = sorted(list(beamed))[-1]
+    beam = ""
+    for y in range(max_y + 1):
+        for x in range(max_x + 1):
+            beam += "#" if (x, y) in beamed else "."
+        beam += "\n"
+    print(beam)
 
-    def print(self, beamed: set) -> None:
-        max_x, max_y = sorted(list(beamed))[-1]
-        for y in range(max_y + 1):
-            line = ""
-            for x in range(max_x + 1):
-                line += "#" if (x, y) in beamed else "."
-            print(line)
 
-    def part_one(self) -> int:
-        self._convert_input_to_int()
-        q_out = deque()
-        for x in range(50):
-            for y in range(50):
-                Intcode(
-                    memory=self.input_int_array, queue_in=deque([x, y]), queue_out=q_out
-                ).execute()
-        return sum(q_out)
-
-    def part_two(self) -> int:
-        # ~30 second runtime
-        self._convert_input_to_int()
-        q_out = deque()
-        beamed = set()
-        # seed beamed coords
+def part_one(input_arr: list[str]) -> int:
+    memory = [int(x) for x in input_arr[0].split(",")]
+    q_out = deque()
+    for x in range(50):
         for y in range(50):
-            for x in range(50):
-                Intcode(
-                    memory=self.input_int_array, queue_in=deque([x, y]), queue_out=q_out
-                ).execute()
-                if q_out.popleft():
-                    beamed.add((x, y))
-        # seed x, y with first contiguous values from beam
-        min_x = max_x = 9
-        y = 11
-        val = 0
-        while not val:
-            next_min = next_max = 0
-            for x in range(min_x, max_x + 2):
-                if (x - 1, y) not in beamed and (x, y - 1) not in beamed:
-                    continue
-                Intcode(
-                    memory=self.input_int_array, queue_in=deque([x, y]), queue_out=q_out
-                ).execute()
-                if q_out.popleft():
-                    if not next_min:
-                        next_min = x
-                    next_max = x
-                    beamed.add((x, y))
-                    if (x - 99, y) in beamed and (x, y - 99) in beamed:
-                        val = (x - 99) * 10000 + (y - 99)
-            min_x = next_min
-            max_x = next_max
-            y += 1
-        return val
+            Intcode(memory=memory, queue_in=deque([x, y]), queue_out=q_out).execute()
+    return sum(q_out)
 
 
-Advent2019Day19().run()
+def part_two(input_arr: list[str]) -> int:
+    memory = [int(x) for x in input_arr[0].split(",")]
+    q_out = deque()
+    x = val = 0
+    y = 50  # start past 0, where the beam is contiguous
+    while not val:
+        # find first column (x) in row (y) affected by beam
+        Intcode(memory=memory, queue_in=deque([x, y]), queue_out=q_out).execute()
+        while not q_out[-1]:
+            x += 1
+            Intcode(memory=memory, queue_in=deque([x, y]), queue_out=q_out).execute()
+
+        # check square corners on right side
+        Intcode(memory=memory, queue_in=deque([x + 99, y]), queue_out=q_out).execute()
+        Intcode(
+            memory=memory, queue_in=deque([x + 99, y - 99]), queue_out=q_out
+        ).execute()
+        if q_out[-2] == q_out[-1] == 1:
+            val = (x * 10000) + (y - 99)
+        y += 1
+    return val
+
+
+input_arr: list[str] = open("advent_2019_day_19.txt").read().splitlines()
+
+print("Advent of Code 2019 - Day 19")
+print(f"Part One: {part_one(input_arr)}")
+print(f"Part Two: {part_two(input_arr)}")
