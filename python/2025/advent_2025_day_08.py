@@ -1,4 +1,3 @@
-from collections import defaultdict
 from math import sqrt
 
 type Coord = tuple[int, int, int]
@@ -8,22 +7,24 @@ def get_distance(c1: Coord, c2: Coord) -> float:
     return sqrt(sum([(c1[i] - c2[i]) ** 2 for i in range(3)]))
 
 
-def part_one(input_arr: list[str]) -> int:
-    coords = [(int(x), int(y), int(z)) for x, y, z in [s.split(",") for s in input_arr]]
-
-    # calculate and sort distances
+def get_distance_coord_pairs(coords: list[Coord]) -> list[tuple[float, Coord, Coord]]:
     distance_coord_pairs = []
     for i in range(len(coords)):
         for j in range(i + 1, len(coords)):
             distance = get_distance(coords[i], coords[j])
             distance_coord_pairs.append((distance, coords[i], coords[j]))
-    distance_coord_pairs.sort()
+    return sorted(distance_coord_pairs)
 
-    # create graph
+
+def part_one(input_arr: list[str]) -> int:
+    coords = [(int(x), int(y), int(z)) for x, y, z in [s.split(",") for s in input_arr]]
+    distance_coord_pairs = get_distance_coord_pairs(coords)
+
+    # create graph from closest 1000 pairs
     coord_graph = {}
     for c in coords:
         coord_graph[c] = set()
-    for distance, c1, c2 in distance_coord_pairs[:1000]:
+    for _, c1, c2 in distance_coord_pairs[:1000]:
         coord_graph[c1].add(c2)
         coord_graph[c2].add(c1)
 
@@ -49,7 +50,25 @@ def part_one(input_arr: list[str]) -> int:
     return circuit_sizes[0] * circuit_sizes[1] * circuit_sizes[2]
 
 
-def part_two(input_arr: list[str]) -> int: ...
+def part_two(input_arr: list[str]) -> int:
+    coords = [(int(x), int(y), int(z)) for x, y, z in [s.split(",") for s in input_arr]]
+    distance_coord_pairs = get_distance_coord_pairs(coords)
+
+    # create graph of all coords, linked to a self containing circuit set
+    coord_circuit_map = {}
+    for c in coords:
+        coord_circuit_map[c] = set([c])
+
+    # iterate through coordinate pairs, sorted by distance, and merge circuit sets
+    dcp_i = 0
+    c1 = c2 = coords[0]
+    while len(coord_circuit_map[c1]) != len(coords):
+        _, c1, c2 = distance_coord_pairs[dcp_i]
+        coord_circuit_map[c1].update(coord_circuit_map[c2])
+        coord_circuit_map[c2].update(coord_circuit_map[c1])
+        coord_circuit_map[c2] = coord_circuit_map[c1]
+        dcp_i += 1
+    return c1[0] * c2[0]
 
 
 input_arr: list[str] = open("advent_2025_day_08.txt").read().splitlines()
